@@ -497,9 +497,8 @@ run_wizard() {
         export PIMPMYSHELL_CONFIG_FILE="$config_file"
         export PIMPMYSHELL_NO_BACKUP="${PIMPMYSHELL_NO_BACKUP:-false}"
 
-        # Apply theme (starship + eza)
-        local theme_name
-        theme_name=$(get_config '.theme' "$DEFAULT_THEME")
+        # Apply theme (starship + eza) - use wizard state directly
+        local theme_name="${WIZARD_THEME:-${DEFAULT_THEME}}"
         log_info "Applying theme: $theme_name"
         apply_theme "$theme_name" || log_warn "Could not apply theme completely"
 
