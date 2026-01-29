@@ -66,6 +66,12 @@ setup() {
 # _generate_env_vars
 # =============================================================================
 
+@test "_generate_env_vars adds ~/.local/bin to PATH" {
+    run _generate_env_vars
+    assert_success
+    assert_output_contains '.local/bin'
+}
+
 @test "_generate_env_vars produces ZSH export" {
     run _generate_env_vars
     assert_success

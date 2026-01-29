@@ -178,6 +178,8 @@ get_config_list() {
 ## Usage: _generate_env_vars
 _generate_env_vars() {
     local zsh_dir="${ZSH:-$HOME/.oh-my-zsh}"
+    # Ensure common tool directories are in PATH
+    echo '[[ ":$PATH:" != *":$HOME/.local/bin:"* ]] && export PATH="$HOME/.local/bin:$PATH"'
     echo "export ZSH=\"${zsh_dir}\""
     echo "export LANG=\"\${LANG:-en_US.UTF-8}\""
     echo "export EDITOR=\"\${EDITOR:-vim}\""
