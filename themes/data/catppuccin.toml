@@ -5,12 +5,12 @@
 palette = "catppuccin_mocha"
 
 format = """
-[](ctp_lavender)\
+[](ctp_blue)\
 $directory\
-[](bg:ctp_mauve fg:ctp_lavender)\
+[](bg:ctp_pink fg:ctp_blue)\
 $git_branch\
 $git_status\
-[](fg:ctp_mauve)\
+[](fg:ctp_pink)\
 $git_state\
 $cmd_duration\
 $fill\
@@ -42,20 +42,20 @@ style = "bold fg:ctp_crust bg:ctp_teal"
 format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold fg:ctp_crust bg:ctp_lavender"
+style = "bold fg:ctp_crust bg:ctp_blue"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncate_to_repo = false
 read_only = " 󰌾"
-read_only_style = "fg:ctp_red bg:ctp_lavender"
+read_only_style = "fg:ctp_red bg:ctp_blue"
 
 [git_branch]
 symbol = " "
-style = "bold fg:ctp_crust bg:ctp_mauve"
+style = "bold fg:ctp_crust bg:ctp_pink"
 format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "bold fg:ctp_crust bg:ctp_mauve"
+style = "bold fg:ctp_crust bg:ctp_pink"
 format = '([$all_status$ahead_behind ]($style))'
 ahead = "↑${count}"
 behind = "↓${count}"

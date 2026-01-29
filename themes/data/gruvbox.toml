@@ -7,10 +7,10 @@ palette = "gruvbox_dark"
 format = """
 [](gruvbox_yellow)\
 $directory\
-[](bg:gruvbox_aqua fg:gruvbox_yellow)\
+[](bg:gruvbox_orange fg:gruvbox_yellow)\
 $git_branch\
 $git_status\
-[](fg:gruvbox_aqua)\
+[](fg:gruvbox_orange)\
 $git_state\
 $cmd_duration\
 $fill\
@@ -51,11 +51,11 @@ read_only_style = "fg:gruvbox_red bg:gruvbox_yellow"
 
 [git_branch]
 symbol = " "
-style = "bold fg:gruvbox_bg0 bg:gruvbox_aqua"
+style = "bold fg:gruvbox_bg0 bg:gruvbox_orange"
 format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "bold fg:gruvbox_bg0 bg:gruvbox_aqua"
+style = "bold fg:gruvbox_bg0 bg:gruvbox_orange"
 format = '([$all_status$ahead_behind ]($style))'
 ahead = "↑${count}"
 behind = "↓${count}"

@@ -5,9 +5,9 @@
 palette = "cyberpunk"
 
 format = """
-[](neon_green)\
+[](neon_pink)\
 $directory\
-[](bg:neon_cyan fg:neon_green)\
+[](bg:neon_cyan fg:neon_pink)\
 $git_branch\
 $git_status\
 [](fg:neon_cyan)\
@@ -42,12 +42,12 @@ style = "bold fg:dark_bg bg:neon_cyan"
 format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold fg:dark_bg bg:neon_green"
+style = "bold fg:dark_bg bg:neon_pink"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncate_to_repo = false
 read_only = " 󰌾"
-read_only_style = "fg:neon_red bg:neon_green"
+read_only_style = "fg:neon_red bg:neon_pink"
 
 [git_branch]
 symbol = " "

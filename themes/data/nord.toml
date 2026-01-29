@@ -5,12 +5,12 @@
 palette = "nord"
 
 format = """
-[](nord_frost2)\
+[](nord_frost1)\
 $directory\
-[](bg:nord_frost0 fg:nord_frost2)\
+[](bg:nord_frost2 fg:nord_frost1)\
 $git_branch\
 $git_status\
-[](fg:nord_frost0)\
+[](fg:nord_frost2)\
 $git_state\
 $cmd_duration\
 $fill\
@@ -42,20 +42,20 @@ style = "bold fg:nord_polar0 bg:nord_frost0"
 format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold fg:nord_polar0 bg:nord_frost2"
+style = "bold fg:nord_polar0 bg:nord_frost1"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncate_to_repo = false
 read_only = " 󰌾"
-read_only_style = "fg:nord_red bg:nord_frost2"
+read_only_style = "fg:nord_red bg:nord_frost1"
 
 [git_branch]
 symbol = " "
-style = "bold fg:nord_polar0 bg:nord_frost0"
+style = "bold fg:nord_polar0 bg:nord_frost2"
 format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "bold fg:nord_polar0 bg:nord_frost0"
+style = "bold fg:nord_polar0 bg:nord_frost2"
 format = '([$all_status$ahead_behind ]($style))'
 ahead = "⇡${count}"
 behind = "⇣${count}"
