@@ -494,13 +494,33 @@ run_wizard() {
     apply_now=$(_wizard_confirm "Apply configuration now?")
 
     if [[ "$apply_now" == "true" ]]; then
-        log_info "Applying configuration..."
         export PIMPMYSHELL_CONFIG_FILE="$config_file"
-        # Source apply functions if available
-        if [[ -n "${_PIMPMYSHELL_CONFIG_LOADED:-}" ]]; then
-            generate_zshrc "${HOME}/.zshrc" 2>/dev/null || log_warn "Could not generate .zshrc"
+        export PIMPMYSHELL_NO_BACKUP="${PIMPMYSHELL_NO_BACKUP:-false}"
+
+        # Apply theme (starship + eza)
+        local theme_name
+        theme_name=$(get_config '.theme' "$DEFAULT_THEME")
+        log_info "Applying theme: $theme_name"
+        apply_theme "$theme_name" || log_warn "Could not apply theme completely"
+
+        # Install custom plugins if oh-my-zsh is available
+        if [[ -n "${_PIMPMYSHELL_PLUGINS_LOADED:-}" ]] && is_omz_installed; then
+            install_plugins || log_warn "Some plugins could not be installed"
         fi
+
+        # Generate .zshrc
+        if [[ -n "${_PIMPMYSHELL_CONFIG_LOADED:-}" ]]; then
+            log_info "Generating .zshrc..."
+            if generate_zshrc "${HOME}/.zshrc"; then
+                log_success "Generated: ${HOME}/.zshrc"
+            else
+                log_warn "Could not generate .zshrc"
+            fi
+        fi
+
+        echo ""
         log_success "Configuration applied!"
+        log_info "Theme: $theme_name"
         log_info "Reload your shell: source ~/.zshrc"
     else
         log_info "Apply later with: pimpmyshell apply"
