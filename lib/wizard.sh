@@ -254,7 +254,7 @@ _wizard_step_theme() {
         [[ -n "$theme" ]] && theme_array+=("$theme")
     done <<< "$themes"
 
-    WIZARD_THEME=$(_wizard_choose "Select a theme:" "${theme_array[@]}")
+    WIZARD_THEME=$(WIZARD_DEFAULT="$WIZARD_THEME" _wizard_choose "Select a theme:" "${theme_array[@]}")
     log_info "Theme: $WIZARD_THEME"
 }
 
