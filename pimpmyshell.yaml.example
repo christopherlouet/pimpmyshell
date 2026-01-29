@@ -1,0 +1,114 @@
+# =============================================================================
+# pimpmyshell - Configuration
+# =============================================================================
+#
+# Copy this file to ~/.config/pimpmyshell/pimpmyshell.yaml and customize it.
+#
+# Apply with: pimpmyshell apply
+# Validate with: pimpmyshell doctor
+
+# -----------------------------------------------------------------------------
+# Theme
+# -----------------------------------------------------------------------------
+# Available: cyberpunk, matrix, dracula, catppuccin, nord, gruvbox, tokyo-night
+theme: cyberpunk
+
+# -----------------------------------------------------------------------------
+# Shell Framework
+# -----------------------------------------------------------------------------
+shell:
+  # Framework: ohmyzsh, prezto, none
+  framework: ohmyzsh
+
+# -----------------------------------------------------------------------------
+# Prompt Engine
+# -----------------------------------------------------------------------------
+prompt:
+  # Engine: starship, p10k, none
+  engine: starship
+
+# -----------------------------------------------------------------------------
+# Plugins
+# -----------------------------------------------------------------------------
+plugins:
+  # Oh-My-Zsh built-in plugins
+  ohmyzsh:
+    - git
+    - fzf
+    - tmux
+    - docker
+    - kubectl
+    - extract
+    - web-search
+    - wd
+    - mise
+    - eza
+
+  # Custom plugins (auto-installed from GitHub)
+  custom:
+    - zsh-autosuggestions
+    - zsh-syntax-highlighting
+    - zsh-bat
+
+# -----------------------------------------------------------------------------
+# CLI Tools
+# -----------------------------------------------------------------------------
+tools:
+  # Required tools (installed automatically)
+  required:
+    - eza
+    - bat
+    - fzf
+    - starship
+
+  # Recommended tools (prompted during install)
+  recommended:
+    - fd
+    - ripgrep
+    - zoxide
+    - delta
+    - tldr
+    - dust
+    - duf
+    - btop
+    - hyperfine
+
+# -----------------------------------------------------------------------------
+# Aliases
+# -----------------------------------------------------------------------------
+aliases:
+  enabled: true
+  groups:
+    - git
+    - docker
+    - kubernetes
+    - navigation
+    - files
+
+# -----------------------------------------------------------------------------
+# Integrations
+# -----------------------------------------------------------------------------
+integrations:
+  fzf:
+    enabled: true
+    preview: true
+    keybindings: true
+  tmux:
+    auto_start: false
+  mise:
+    enabled: true
+
+# -----------------------------------------------------------------------------
+# Keybindings
+# -----------------------------------------------------------------------------
+keybindings:
+  preset: default
+
+# -----------------------------------------------------------------------------
+# Platform-specific settings
+# -----------------------------------------------------------------------------
+platform:
+  linux:
+    package_manager: apt
+  macos:
+    package_manager: brew
