@@ -1,52 +1,62 @@
 # Catppuccin Theme for Starship
-# Soft pastel colors, easy on the eyes
+# Soft pastel colors, easy on the eyes - Powerline style
 # Based on https://github.com/catppuccin/catppuccin (Mocha flavor)
 
 palette = "catppuccin_mocha"
 
 format = """
-$username\
-$hostname\
+[](ctp_lavender)\
 $directory\
+[](bg:ctp_mauve fg:ctp_lavender)\
 $git_branch\
 $git_status\
+[](fg:ctp_mauve)\
 $git_state\
 $cmd_duration\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$docker_context\
 $line_break\
 $character"""
 
+[fill]
+symbol = " "
+
 [character]
-success_symbol = "[○](bold ctp_green)"
-error_symbol = "[○](bold ctp_red)"
-vimcmd_symbol = "[●](bold ctp_mauve)"
+success_symbol = "[❯](bold ctp_green)"
+error_symbol = "[❯](bold ctp_red)"
+vimcmd_symbol = "[❮](bold ctp_mauve)"
 
 [username]
 show_always = false
-style_user = "ctp_pink bold"
-style_root = "ctp_red bold"
-format = "[$user]($style)@"
+style_user = "bold fg:ctp_crust bg:ctp_pink"
+style_root = "bold fg:ctp_crust bg:ctp_red"
+format = "[ $user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "ctp_teal"
-format = "[$hostname]($style):"
+style = "bold fg:ctp_crust bg:ctp_teal"
+format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold ctp_lavender"
-format = "[$path]($style)[$read_only]($read_only_style) "
-truncation_length = 4
-truncate_to_repo = true
-read_only = " "
-read_only_style = "ctp_red"
+style = "bold fg:ctp_crust bg:ctp_lavender"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo = false
+read_only = " 󰌾"
+read_only_style = "fg:ctp_red bg:ctp_lavender"
 
 [git_branch]
 symbol = " "
-style = "bold ctp_mauve"
-format = "[$symbol$branch]($style) "
+style = "bold fg:ctp_crust bg:ctp_mauve"
+format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "ctp_peach"
-format = '([$all_status$ahead_behind]($style) )'
+style = "bold fg:ctp_crust bg:ctp_mauve"
+format = '([$all_status$ahead_behind ]($style))'
 ahead = "↑${count}"
 behind = "↓${count}"
 diverged = "↕↑${ahead_count}↓${behind_count}"
@@ -59,13 +69,13 @@ renamed = "»"
 deleted = "x"
 
 [git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
+format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
 style = "bold ctp_yellow"
 
 [cmd_duration]
 min_time = 2_000
-style = "ctp_yellow"
-format = "took [$duration]($style) "
+style = "bold ctp_yellow"
+format = " ⏱ [$duration]($style)"
 
 [line_break]
 disabled = false

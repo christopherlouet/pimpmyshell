@@ -1,71 +1,81 @@
 # Tokyo Night Theme for Starship
-# Dark theme inspired by Tokyo city lights
+# Dark theme inspired by Tokyo city lights - Powerline style
 # Based on https://github.com/enkia/tokyo-night-vscode-theme
 
 palette = "tokyo_night"
 
 format = """
-$username\
-$hostname\
+[](tokyo_blue)\
 $directory\
+[](bg:tokyo_purple fg:tokyo_blue)\
 $git_branch\
 $git_status\
+[](fg:tokyo_purple)\
 $git_state\
 $cmd_duration\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$docker_context\
 $line_break\
 $character"""
 
+[fill]
+symbol = " "
+
 [character]
-success_symbol = "[▸](bold tokyo_green)"
-error_symbol = "[▸](bold tokyo_red)"
-vimcmd_symbol = "[◂](bold tokyo_purple)"
+success_symbol = "[❯](bold tokyo_green)"
+error_symbol = "[❯](bold tokyo_red)"
+vimcmd_symbol = "[❮](bold tokyo_purple)"
 
 [username]
 show_always = false
-style_user = "tokyo_magenta bold"
-style_root = "tokyo_red bold"
-format = "[$user]($style)@"
+style_user = "bold fg:tokyo_bg bg:tokyo_magenta"
+style_root = "bold fg:tokyo_bg bg:tokyo_red"
+format = "[ $user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "tokyo_blue"
-format = "[$hostname]($style):"
+style = "bold fg:tokyo_bg bg:tokyo_blue"
+format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold tokyo_blue"
-format = "[$path]($style)[$read_only]($read_only_style) "
-truncation_length = 4
-truncate_to_repo = true
+style = "bold fg:tokyo_bg bg:tokyo_blue"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo = false
 read_only = " 󰌾"
-read_only_style = "tokyo_red"
+read_only_style = "fg:tokyo_red bg:tokyo_blue"
 
 [git_branch]
-symbol = "⎇ "
-style = "bold tokyo_purple"
-format = "[$symbol$branch]($style) "
+symbol = " "
+style = "bold fg:tokyo_bg bg:tokyo_purple"
+format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "tokyo_cyan"
-format = '([$all_status$ahead_behind]($style) )'
+style = "bold fg:tokyo_bg bg:tokyo_purple"
+format = '([$all_status$ahead_behind ]($style))'
 ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
 conflicted = "⚡"
 untracked = "?"
 stashed = "📦"
-modified = "✎"
+modified = "!"
 staged = "+"
 renamed = "»"
 deleted = "✘"
 
 [git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
+format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
 style = "bold tokyo_orange"
 
 [cmd_duration]
 min_time = 2_000
-style = "tokyo_yellow"
-format = "⏱ [$duration]($style) "
+style = "bold tokyo_yellow"
+format = " ⏱ [$duration]($style)"
 
 [line_break]
 disabled = false

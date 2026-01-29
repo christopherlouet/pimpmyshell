@@ -1,52 +1,62 @@
 # Dracula Theme for Starship
-# Popular dark theme with purple accents
+# Popular dark theme with purple accents - Powerline style
 # Based on https://draculatheme.com
 
 palette = "dracula"
 
 format = """
-$username\
-$hostname\
+[](dracula_purple)\
 $directory\
+[](bg:dracula_pink fg:dracula_purple)\
 $git_branch\
 $git_status\
+[](fg:dracula_pink)\
 $git_state\
 $cmd_duration\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$docker_context\
 $line_break\
 $character"""
 
+[fill]
+symbol = " "
+
 [character]
-success_symbol = "[λ](bold dracula_purple)"
-error_symbol = "[λ](bold dracula_red)"
-vimcmd_symbol = "[ν](bold dracula_green)"
+success_symbol = "[❯](bold dracula_purple)"
+error_symbol = "[❯](bold dracula_red)"
+vimcmd_symbol = "[❮](bold dracula_green)"
 
 [username]
 show_always = false
-style_user = "dracula_pink bold"
-style_root = "dracula_red bold"
-format = "[$user]($style)@"
+style_user = "bold fg:dracula_background bg:dracula_pink"
+style_root = "bold fg:dracula_background bg:dracula_red"
+format = "[ $user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "dracula_cyan"
-format = "[$hostname]($style):"
+style = "bold fg:dracula_background bg:dracula_cyan"
+format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold dracula_cyan"
-format = "[$path]($style)[$read_only]($read_only_style) "
-truncation_length = 4
-truncate_to_repo = true
+style = "bold fg:dracula_background bg:dracula_purple"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo = false
 read_only = " 󰌾"
-read_only_style = "dracula_red"
+read_only_style = "fg:dracula_red bg:dracula_purple"
 
 [git_branch]
 symbol = " "
-style = "bold dracula_purple"
-format = "on [$symbol$branch]($style) "
+style = "bold fg:dracula_background bg:dracula_pink"
+format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "dracula_pink"
-format = '([\[$all_status$ahead_behind\]]($style) )'
+style = "bold fg:dracula_background bg:dracula_pink"
+format = '([$all_status$ahead_behind ]($style))'
 ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
@@ -59,13 +69,13 @@ renamed = "»"
 deleted = "✘"
 
 [git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
+format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
 style = "bold dracula_yellow"
 
 [cmd_duration]
 min_time = 2_000
-style = "dracula_yellow"
-format = "took [$duration]($style) "
+style = "bold dracula_yellow"
+format = " ⏱ [$duration]($style)"
 
 [line_break]
 disabled = false

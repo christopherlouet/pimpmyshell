@@ -1,76 +1,86 @@
 # Cyberpunk Theme for Starship
-# Neon pink and cyan, futuristic aesthetics
+# Neon pink and cyan, futuristic aesthetics - Powerline style
 # "Welcome to Night City, choom"
 
 palette = "cyberpunk"
 
 format = """
-$username\
-$hostname\
+[](neon_green)\
 $directory\
+[](bg:neon_cyan fg:neon_green)\
 $git_branch\
 $git_status\
+[](fg:neon_cyan)\
 $git_state\
 $cmd_duration\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$docker_context\
 $line_break\
 $character"""
 
+[fill]
+symbol = " "
+
 [character]
-success_symbol = "[◈](bold neon_cyan)"
-error_symbol = "[◈](bold neon_red)"
-vimcmd_symbol = "[◇](bold neon_pink)"
+success_symbol = "[❯](bold neon_cyan)"
+error_symbol = "[❯](bold neon_red)"
+vimcmd_symbol = "[❮](bold neon_pink)"
 
 [username]
 show_always = false
-style_user = "neon_pink bold"
-style_root = "neon_red bold"
-format = "[$user]($style)@"
+style_user = "bold fg:dark_bg bg:neon_pink"
+style_root = "bold fg:dark_bg bg:neon_red"
+format = "[ $user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "neon_cyan"
-format = "[$hostname]($style):"
+style = "bold fg:dark_bg bg:neon_cyan"
+format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold neon_pink"
-format = "[$path]($style)[$read_only]($read_only_style) "
-truncation_length = 4
-truncate_to_repo = true
-read_only = " "
-read_only_style = "neon_red"
+style = "bold fg:dark_bg bg:neon_green"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo = false
+read_only = " 󰌾"
+read_only_style = "fg:neon_red bg:neon_green"
 
 [git_branch]
-symbol = "⟫ "
-style = "bold neon_cyan"
-format = "[$symbol$branch]($style) "
+symbol = " "
+style = "bold fg:dark_bg bg:neon_cyan"
+format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "neon_yellow"
-format = '([$all_status$ahead_behind]($style) )'
-ahead = "⚡${count}"
-behind = "⬇${count}"
-diverged = "⚡⬆${ahead_count}⬇${behind_count}"
-conflicted = "⚔"
-untracked = "★"
+style = "bold fg:dark_bg bg:neon_cyan"
+format = '([$all_status$ahead_behind ]($style))'
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+conflicted = "="
+untracked = "?"
 stashed = "📦"
-modified = "✎"
-staged = "✚"
-renamed = "➜"
-deleted = "✖"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
 
 [git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
+format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
 style = "bold neon_orange"
 
 [cmd_duration]
 min_time = 2_000
-style = "neon_purple"
-format = "⏱ [$duration]($style) "
+style = "bold neon_purple"
+format = " ⏱ [$duration]($style)"
 
 [line_break]
 disabled = false
 
-# Language/Tool indicators with cyberpunk symbols
+# Language/Tool indicators
 [nodejs]
 symbol = "⬡ "
 style = "neon_green"

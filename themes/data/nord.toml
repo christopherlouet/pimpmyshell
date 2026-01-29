@@ -1,52 +1,62 @@
 # Nord Theme for Starship
-# Cool blue tones from the Arctic
+# Cool blue tones from the Arctic - Powerline style
 # Based on https://www.nordtheme.com
 
 palette = "nord"
 
 format = """
-$username\
-$hostname\
+[](nord_frost2)\
 $directory\
+[](bg:nord_frost0 fg:nord_frost2)\
 $git_branch\
 $git_status\
+[](fg:nord_frost0)\
 $git_state\
 $cmd_duration\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$docker_context\
 $line_break\
 $character"""
 
+[fill]
+symbol = " "
+
 [character]
-success_symbol = "[➜](bold nord_green)"
-error_symbol = "[➜](bold nord_red)"
-vimcmd_symbol = "[➜](bold nord_purple)"
+success_symbol = "[❯](bold nord_green)"
+error_symbol = "[❯](bold nord_red)"
+vimcmd_symbol = "[❮](bold nord_purple)"
 
 [username]
 show_always = false
-style_user = "nord_cyan bold"
-style_root = "nord_red bold"
-format = "[$user]($style)@"
+style_user = "bold fg:nord_polar0 bg:nord_frost1"
+style_root = "bold fg:nord_polar0 bg:nord_red"
+format = "[ $user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "nord_blue"
-format = "[$hostname]($style):"
+style = "bold fg:nord_polar0 bg:nord_frost0"
+format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold nord_blue"
-format = "[$path]($style)[$read_only]($read_only_style) "
-truncation_length = 4
-truncate_to_repo = true
-read_only = " "
-read_only_style = "nord_red"
+style = "bold fg:nord_polar0 bg:nord_frost2"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo = false
+read_only = " 󰌾"
+read_only_style = "fg:nord_red bg:nord_frost2"
 
 [git_branch]
 symbol = " "
-style = "bold nord_cyan"
-format = "on [$symbol$branch]($style) "
+style = "bold fg:nord_polar0 bg:nord_frost0"
+format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "nord_yellow"
-format = '([\[$all_status$ahead_behind\]]($style) )'
+style = "bold fg:nord_polar0 bg:nord_frost0"
+format = '([$all_status$ahead_behind ]($style))'
 ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
@@ -59,13 +69,13 @@ renamed = "»"
 deleted = "✘"
 
 [git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
+format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
 style = "bold nord_orange"
 
 [cmd_duration]
 min_time = 2_000
-style = "nord_frost3"
-format = "took [$duration]($style) "
+style = "bold nord_frost3"
+format = " ⏱ [$duration]($style)"
 
 [line_break]
 disabled = false

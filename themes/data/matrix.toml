@@ -1,19 +1,29 @@
 # Matrix Theme for Starship
-# Green on black, classic hacker aesthetic
+# Green on black, classic hacker aesthetic - Powerline style
 # "Wake up, Neo..."
 
 palette = "matrix"
 
 format = """
-$username\
-$hostname\
+[](matrix_green)\
 $directory\
+[](bg:matrix_bright_green fg:matrix_green)\
 $git_branch\
 $git_status\
+[](fg:matrix_bright_green)\
 $git_state\
 $cmd_duration\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$docker_context\
 $line_break\
 $character"""
+
+[fill]
+symbol = " "
 
 [character]
 success_symbol = "[❯](bold matrix_green)"
@@ -22,31 +32,31 @@ vimcmd_symbol = "[❮](bold matrix_green)"
 
 [username]
 show_always = false
-style_user = "matrix_green bold"
-style_root = "matrix_red bold"
-format = "[$user]($style)@"
+style_user = "bold fg:matrix_black bg:matrix_green"
+style_root = "bold fg:matrix_black bg:matrix_red"
+format = "[ $user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "matrix_bright_green"
-format = "[$hostname]($style):"
+style = "bold fg:matrix_black bg:matrix_bright_green"
+format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold matrix_green"
-format = "[$path]($style)[$read_only]($read_only_style) "
-truncation_length = 4
-truncate_to_repo = true
-read_only = " 🔒"
-read_only_style = "matrix_red"
+style = "bold fg:matrix_black bg:matrix_green"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo = false
+read_only = " 󰌾"
+read_only_style = "fg:matrix_red bg:matrix_green"
 
 [git_branch]
 symbol = " "
-style = "bold matrix_bright_green"
-format = "on [$symbol$branch]($style) "
+style = "bold fg:matrix_black bg:matrix_bright_green"
+format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "matrix_green"
-format = '([\[$all_status$ahead_behind\]]($style) )'
+style = "bold fg:matrix_black bg:matrix_bright_green"
+format = '([$all_status$ahead_behind ]($style))'
 ahead = "⇡${count}"
 behind = "⇣${count}"
 diverged = "⇕⇡${ahead_count}⇣${behind_count}"
@@ -59,13 +69,13 @@ renamed = "»"
 deleted = "✘"
 
 [git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
+format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
 style = "bold matrix_yellow"
 
 [cmd_duration]
 min_time = 2_000
-style = "matrix_dim_green"
-format = "took [$duration]($style) "
+style = "bold matrix_dim_green"
+format = " ⏱ [$duration]($style)"
 
 [line_break]
 disabled = false

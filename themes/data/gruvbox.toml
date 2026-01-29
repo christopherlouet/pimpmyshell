@@ -1,52 +1,62 @@
 # Gruvbox Theme for Starship
-# Retro warm colors with excellent contrast
+# Retro warm colors with excellent contrast - Powerline style
 # Based on https://github.com/morhetz/gruvbox (Dark mode)
 
 palette = "gruvbox_dark"
 
 format = """
-$username\
-$hostname\
+[](gruvbox_yellow)\
 $directory\
+[](bg:gruvbox_aqua fg:gruvbox_yellow)\
 $git_branch\
 $git_status\
+[](fg:gruvbox_aqua)\
 $git_state\
 $cmd_duration\
+$fill\
+$nodejs\
+$python\
+$rust\
+$golang\
+$docker_context\
 $line_break\
 $character"""
 
+[fill]
+symbol = " "
+
 [character]
-success_symbol = "[❱](bold gruvbox_green)"
-error_symbol = "[❱](bold gruvbox_red)"
-vimcmd_symbol = "[❰](bold gruvbox_aqua)"
+success_symbol = "[❯](bold gruvbox_green)"
+error_symbol = "[❯](bold gruvbox_red)"
+vimcmd_symbol = "[❮](bold gruvbox_aqua)"
 
 [username]
 show_always = false
-style_user = "gruvbox_yellow bold"
-style_root = "gruvbox_red bold"
-format = "[$user]($style)@"
+style_user = "bold fg:gruvbox_bg0 bg:gruvbox_yellow"
+style_root = "bold fg:gruvbox_bg0 bg:gruvbox_red"
+format = "[ $user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "gruvbox_blue"
-format = "[$hostname]($style):"
+style = "bold fg:gruvbox_bg0 bg:gruvbox_blue"
+format = "[ $hostname ]($style)"
 
 [directory]
-style = "bold gruvbox_yellow"
-format = "[$path]($style)[$read_only]($read_only_style) "
-truncation_length = 4
-truncate_to_repo = true
-read_only = " "
-read_only_style = "gruvbox_red"
+style = "bold fg:gruvbox_bg0 bg:gruvbox_yellow"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo = false
+read_only = " 󰌾"
+read_only_style = "fg:gruvbox_red bg:gruvbox_yellow"
 
 [git_branch]
 symbol = " "
-style = "bold gruvbox_aqua"
-format = "on [$symbol$branch]($style) "
+style = "bold fg:gruvbox_bg0 bg:gruvbox_aqua"
+format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "gruvbox_orange"
-format = '([$all_status$ahead_behind]($style) )'
+style = "bold fg:gruvbox_bg0 bg:gruvbox_aqua"
+format = '([$all_status$ahead_behind ]($style))'
 ahead = "↑${count}"
 behind = "↓${count}"
 diverged = "↕↑${ahead_count}↓${behind_count}"
@@ -59,13 +69,13 @@ renamed = "»"
 deleted = "✘"
 
 [git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
+format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
 style = "bold gruvbox_purple"
 
 [cmd_duration]
 min_time = 2_000
-style = "gruvbox_gray"
-format = "took [$duration]($style) "
+style = "bold gruvbox_gray"
+format = " ⏱ [$duration]($style)"
 
 [line_break]
 disabled = false
