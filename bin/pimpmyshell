@@ -1,0 +1,505 @@
+#!/usr/bin/env bash
+# pimpmyshell - Configure a complete, beautiful zsh environment
+# https://github.com/christopherlouet/pimpmyshell
+#
+# Usage: pimpmyshell <command> [options]
+
+set -euo pipefail
+
+# -----------------------------------------------------------------------------
+# Script path resolution (handle symlinks)
+# -----------------------------------------------------------------------------
+
+resolve_script_path() {
+    local source="${BASH_SOURCE[0]}"
+    while [[ -L "$source" ]]; do
+        local dir
+        dir="$(cd -P "$(dirname "$source")" && pwd)"
+        source="$(readlink "$source")"
+        [[ "$source" != /* ]] && source="$dir/$source"
+    done
+    cd -P "$(dirname "$source")" && pwd
+}
+
+PIMPMYSHELL_BIN_DIR="$(resolve_script_path)"
+PIMPMYSHELL_ROOT="$(dirname "$PIMPMYSHELL_BIN_DIR")"
+export PIMPMYSHELL_LIB_DIR="${PIMPMYSHELL_ROOT}/lib"
+export PIMPMYSHELL_MODULES_DIR="${PIMPMYSHELL_ROOT}/modules"
+export PIMPMYSHELL_THEMES_DIR="${PIMPMYSHELL_ROOT}/themes"
+export PIMPMYSHELL_TEMPLATES_DIR="${PIMPMYSHELL_ROOT}/templates"
+
+# -----------------------------------------------------------------------------
+# Load core library
+# -----------------------------------------------------------------------------
+
+# shellcheck source=../lib/core.sh
+source "${PIMPMYSHELL_LIB_DIR}/core.sh"
+# shellcheck source=../lib/config.sh
+source "${PIMPMYSHELL_LIB_DIR}/config.sh"
+# shellcheck source=../lib/themes.sh
+source "${PIMPMYSHELL_LIB_DIR}/themes.sh"
+# shellcheck source=../lib/plugins.sh
+source "${PIMPMYSHELL_LIB_DIR}/plugins.sh"
+# shellcheck source=../lib/tools.sh
+source "${PIMPMYSHELL_LIB_DIR}/tools.sh"
+# shellcheck source=../lib/backup.sh
+source "${PIMPMYSHELL_LIB_DIR}/backup.sh"
+# shellcheck source=../lib/doctor.sh
+source "${PIMPMYSHELL_LIB_DIR}/doctor.sh"
+# shellcheck source=../lib/wizard.sh
+source "${PIMPMYSHELL_LIB_DIR}/wizard.sh"
+# shellcheck source=../lib/profiles.sh
+source "${PIMPMYSHELL_LIB_DIR}/profiles.sh"
+
+# -----------------------------------------------------------------------------
+# Help & usage
+# -----------------------------------------------------------------------------
+
+print_banner() {
+    echo -e "${MAGENTA}"
+    cat << 'EOF'
+        .__                                        .__           .__  .__
+______  |__| _____ ______  _____ ___.__.  _____  |  |__   ____ |  | |  |
+\____ \ |  |/     \\____ \/     <   |  | /     \ |  |  \_/ __ \|  | |  |
+|  |_> >|  |  Y Y  \  |_> >  Y  \___  ||  Y Y  \|   Y  \  ___/|  |_|  |__
+|   __/ |__|__|_|  /   __/|__|_|  / ____||__|_|  /|___|  /\___  >____/____/
+|__|             \/|__|         \/\/            \/      \/     \/
+EOF
+    echo -e "${RESET}"
+}
+
+show_help() {
+    print_banner
+    echo -e "${BOLD}pimpmyshell${RESET} v${PIMPMYSHELL_VERSION} - Configure a complete, beautiful zsh environment"
+    echo ""
+    echo -e "${BOLD}USAGE${RESET}"
+    echo "    pimpmyshell <command> [options]"
+    echo ""
+    echo -e "${BOLD}COMMANDS${RESET}"
+    echo "    apply               Apply configuration (generate .zshrc, theme, plugins)"
+    echo "    theme [name]        Show or change the current theme"
+    echo "    theme --list        List available themes"
+    echo "    theme --preview     Preview all themes"
+    echo "    tools check         Check installed tools"
+    echo "    tools install       Install required and recommended tools"
+    echo "    backup              Create a manual backup"
+    echo "    restore             Restore from backup"
+    echo "    doctor              Run diagnostics on your environment"
+    echo "    wizard              Interactive setup wizard"
+    echo "    profile list        List configuration profiles"
+    echo "    profile create      Create a new profile"
+    echo "    profile switch      Switch to a profile"
+    echo "    profile delete      Delete a profile"
+    echo "    update              Update pimpmyshell to latest version"
+    echo "    version             Show version"
+    echo "    help                Show this help message"
+    echo ""
+    echo -e "${BOLD}OPTIONS${RESET}"
+    echo "    -c, --config FILE   Use a specific config file"
+    echo "    -v, --verbose       Enable verbose output"
+    echo "    -d, --debug         Enable debug output"
+    echo "    -q, --quiet         Suppress all output except errors"
+    echo "    --dry-run           Show what would be done without making changes"
+    echo "    --no-backup         Skip automatic backup before apply"
+    echo ""
+    echo -e "${BOLD}EXAMPLES${RESET}"
+    echo "    pimpmyshell wizard              # Interactive setup"
+    echo "    pimpmyshell apply               # Apply configuration"
+    echo "    pimpmyshell theme cyberpunk     # Switch to cyberpunk theme"
+    echo "    pimpmyshell tools install       # Install CLI tools"
+    echo "    pimpmyshell doctor              # Check environment"
+    echo ""
+    echo -e "${BOLD}CONFIGURATION${RESET}"
+    echo "    Config file: \${XDG_CONFIG_HOME:-~/.config}/pimpmyshell/pimpmyshell.yaml"
+    echo "    Data dir:    \${XDG_DATA_HOME:-~/.local/share}/pimpmyshell/"
+    echo ""
+    echo -e "See ${CYAN}https://github.com/christopherlouet/pimpmyshell${RESET} for documentation."
+}
+
+show_version() {
+    echo "pimpmyshell v${PIMPMYSHELL_VERSION}"
+}
+
+# -----------------------------------------------------------------------------
+# Command stubs (to be implemented in subsequent phases)
+# -----------------------------------------------------------------------------
+
+cmd_apply() {
+    local config_file="${PIMPMYSHELL_CONFIG_FILE:-}"
+    if [[ -z "$config_file" ]]; then
+        config_file="${PIMPMYSHELL_CONFIG_DIR}/pimpmyshell.yaml"
+    fi
+
+    # Check config file exists
+    if [[ ! -f "$config_file" ]]; then
+        log_error "Config file not found: $config_file"
+        log_info "Create one with: cp pimpmyshell.yaml.example ${config_file}"
+        return 1
+    fi
+
+    export PIMPMYSHELL_CONFIG_FILE="$config_file"
+    log_info "Using config: $config_file"
+
+    # Validate configuration
+    # shellcheck source=../lib/validation.sh
+    source "${PIMPMYSHELL_LIB_DIR}/validation.sh"
+    if ! validate_config "$config_file"; then
+        log_error "Configuration validation failed"
+        return 1
+    fi
+
+    # Backup before apply (unless --no-backup)
+    if [[ "$PIMPMYSHELL_NO_BACKUP" != "true" ]]; then
+        log_info "Creating backup..."
+        backup_before_apply
+    fi
+
+    # Get theme name
+    local theme_name
+    theme_name=$(get_config '.theme' "$DEFAULT_THEME")
+
+    # Apply theme (starship + eza)
+    log_info "Applying theme: $theme_name"
+    apply_theme "$theme_name" || log_warn "Could not apply theme completely"
+
+    # Install custom plugins if oh-my-zsh is available
+    if is_omz_installed; then
+        install_plugins || log_warn "Some plugins could not be installed"
+    fi
+
+    # Generate .zshrc
+    local zshrc_file="${HOME}/.zshrc"
+    log_info "Generating .zshrc..."
+    if generate_zshrc "$zshrc_file"; then
+        log_success "Generated: $zshrc_file"
+    else
+        log_error "Failed to generate .zshrc"
+        return 1
+    fi
+
+    # Summary
+    echo ""
+    log_success "Configuration applied successfully!"
+    log_info "Theme: $theme_name"
+    log_info "Config: $config_file"
+    log_info "Reload your shell: source ~/.zshrc"
+}
+
+cmd_theme() {
+    local subcmd="${1:-}"
+    shift 2>/dev/null || true
+
+    case "$subcmd" in
+        --list)
+            echo -e "${BOLD}Available themes:${RESET}"
+            local themes
+            themes=$(list_themes)
+            local current_theme
+            current_theme=$(get_config '.theme' "$DEFAULT_THEME")
+            while IFS= read -r theme; do
+                if [[ "$theme" == "$current_theme" ]]; then
+                    echo -e "  ${GREEN}* ${theme}${RESET} (current)"
+                else
+                    echo "    ${theme}"
+                fi
+            done <<< "$themes"
+            ;;
+        --preview)
+            local themes
+            themes=$(list_themes)
+            while IFS= read -r theme; do
+                preview_theme "$theme"
+            done <<< "$themes"
+            ;;
+        "")
+            local current_theme
+            current_theme=$(get_config '.theme' "$DEFAULT_THEME")
+            echo -e "${BOLD}Current theme:${RESET} ${current_theme}"
+            ;;
+        *)
+            local theme_name="$subcmd"
+            if ! get_theme_path "$theme_name" >/dev/null 2>&1; then
+                log_error "Unknown theme: $theme_name"
+                echo "Available themes: $(list_themes | tr '\n' ' ')"
+                return 1
+            fi
+            apply_theme "$theme_name"
+            log_success "Theme switched to: $theme_name"
+            ;;
+    esac
+}
+
+cmd_tools() {
+    local subcmd="${1:-}"
+    shift 2>/dev/null || true
+
+    case "$subcmd" in
+        check)
+            check_tools
+            ;;
+        install)
+            install_all_tools "$@"
+            ;;
+        *)
+            log_error "Unknown tools subcommand: $subcmd"
+            echo "Usage: pimpmyshell tools {check|install}"
+            return 1
+            ;;
+    esac
+}
+
+cmd_backup() {
+    log_info "Creating manual backup..."
+    backup_before_apply
+    log_success "Backup complete"
+    echo ""
+    log_info "Backups stored in: $PIMPMYSHELL_BACKUP_DIR"
+    local count
+    count=$(find "$PIMPMYSHELL_BACKUP_DIR" -name "*.bak" -type f 2>/dev/null | wc -l)
+    log_info "Total backups: $count"
+}
+
+cmd_restore() {
+    local subcmd="${1:-}"
+
+    case "$subcmd" in
+        --latest)
+            local latest
+            latest=$(get_latest_backup ".zshrc")
+            if [[ -z "$latest" ]]; then
+                log_error "No .zshrc backups found"
+                return 1
+            fi
+            restore_file "$latest" "${HOME}/.zshrc"
+            ;;
+        "")
+            # List available backups
+            local backups
+            backups=$(list_backups)
+            if [[ -z "$backups" ]]; then
+                log_error "No backups available"
+                return 1
+            fi
+            echo -e "${BOLD}Available backups:${RESET}"
+            echo "$backups" | while IFS= read -r backup; do
+                echo "  $(basename "$backup")"
+            done
+            echo ""
+            log_info "Use: pimpmyshell restore --latest"
+            ;;
+        *)
+            # Restore specific backup file
+            if [[ -f "$subcmd" ]]; then
+                restore_file "$subcmd" "${HOME}/.zshrc"
+            else
+                log_error "Backup file not found: $subcmd"
+                return 1
+            fi
+            ;;
+    esac
+}
+
+cmd_doctor() {
+    run_doctor
+}
+
+cmd_wizard() {
+    run_wizard
+}
+
+cmd_profile() {
+    local subcmd="${1:-}"
+    shift 2>/dev/null || true
+
+    # Ensure profiles are initialized
+    init_profiles
+
+    case "$subcmd" in
+        list)
+            echo -e "${BOLD}Available profiles:${RESET}"
+            local profiles
+            profiles=$(list_profiles)
+            local current
+            current=$(get_current_profile)
+            while IFS= read -r profile; do
+                [[ -z "$profile" ]] && continue
+                if [[ "$profile" == "$current" ]]; then
+                    echo -e "  ${GREEN}* ${profile}${RESET} (active)"
+                else
+                    echo "    ${profile}"
+                fi
+            done <<< "$profiles"
+            ;;
+        create)
+            local name="${1:-}"
+            if [[ -z "$name" ]]; then
+                log_error "Profile name required"
+                echo "Usage: pimpmyshell profile create <name>"
+                return 1
+            fi
+            create_profile "$name"
+            ;;
+        switch)
+            local name="${1:-}"
+            if [[ -z "$name" ]]; then
+                log_error "Profile name required"
+                echo "Usage: pimpmyshell profile switch <name>"
+                return 1
+            fi
+            switch_profile "$name"
+            ;;
+        delete)
+            local name="${1:-}"
+            if [[ -z "$name" ]]; then
+                log_error "Profile name required"
+                echo "Usage: pimpmyshell profile delete <name>"
+                return 1
+            fi
+            delete_profile "$name"
+            ;;
+        *)
+            log_error "Unknown profile subcommand: $subcmd"
+            echo "Usage: pimpmyshell profile {list|create|switch|delete} [name]"
+            return 1
+            ;;
+    esac
+}
+
+cmd_update() {
+    log_info "Checking for pimpmyshell updates..."
+
+    # Verify we have a git repo
+    if [[ ! -d "${PIMPMYSHELL_ROOT}/.git" ]]; then
+        log_error "pimpmyshell is not installed from git"
+        log_info "Reinstall with: curl -fsSL https://raw.githubusercontent.com/christopherlouet/pimpmyshell/main/install.sh | bash"
+        return 1
+    fi
+
+    # Get current version
+    local current_version="${PIMPMYSHELL_VERSION}"
+    log_info "Current pimpmyshell version: v${current_version}"
+
+    # Pull latest changes
+    if ! git -C "$PIMPMYSHELL_ROOT" pull --rebase 2>/dev/null; then
+        log_error "Failed to pull latest changes"
+        log_info "Check your network connection or update manually"
+        return 1
+    fi
+
+    # Show new version
+    local new_version
+    new_version=$(grep -oP 'PIMPMYSHELL_VERSION="\K[^"]+' "${PIMPMYSHELL_LIB_DIR}/core.sh" 2>/dev/null || echo "$current_version")
+    log_success "pimpmyshell updated to v${new_version}"
+
+    # Re-apply config if it exists
+    local config_file="${PIMPMYSHELL_CONFIG_DIR}/pimpmyshell.yaml"
+    if [[ -f "$config_file" ]]; then
+        log_info "Re-applying configuration..."
+        export PIMPMYSHELL_CONFIG_FILE="$config_file"
+        cmd_apply 2>/dev/null || log_warn "Could not re-apply configuration"
+    fi
+}
+
+# -----------------------------------------------------------------------------
+# Argument parsing
+# -----------------------------------------------------------------------------
+
+PIMPMYSHELL_CONFIG_FILE=""
+PIMPMYSHELL_DRY_RUN=false
+PIMPMYSHELL_NO_BACKUP=false
+
+parse_global_options() {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -c|--config)
+                PIMPMYSHELL_CONFIG_FILE="$2"
+                shift 2
+                ;;
+            -v|--verbose)
+                export PIMPMYSHELL_VERBOSITY=2
+                shift
+                ;;
+            -d|--debug)
+                export PIMPMYSHELL_VERBOSITY=3
+                shift
+                ;;
+            -q|--quiet)
+                export PIMPMYSHELL_VERBOSITY=0
+                shift
+                ;;
+            --dry-run)
+                PIMPMYSHELL_DRY_RUN=true
+                shift
+                ;;
+            --no-backup)
+                PIMPMYSHELL_NO_BACKUP=true
+                shift
+                ;;
+            *)
+                # Not a global option, return remaining args
+                REMAINING_ARGS=("$@")
+                return 0
+                ;;
+        esac
+    done
+    REMAINING_ARGS=()
+}
+
+# -----------------------------------------------------------------------------
+# Main routing
+# -----------------------------------------------------------------------------
+
+main() {
+    # Parse global options first
+    parse_global_options "$@"
+    set -- "${REMAINING_ARGS[@]:-}"
+
+    # Get command
+    local command="${1:-help}"
+    shift 2>/dev/null || true
+
+    # Route to command
+    case "$command" in
+        apply)
+            cmd_apply "$@"
+            ;;
+        theme)
+            cmd_theme "$@"
+            ;;
+        tools)
+            cmd_tools "$@"
+            ;;
+        backup)
+            cmd_backup "$@"
+            ;;
+        restore)
+            cmd_restore "$@"
+            ;;
+        doctor)
+            cmd_doctor "$@"
+            ;;
+        wizard)
+            cmd_wizard "$@"
+            ;;
+        profile)
+            cmd_profile "$@"
+            ;;
+        update)
+            cmd_update "$@"
+            ;;
+        version|--version|-V)
+            show_version
+            ;;
+        help|--help|-h)
+            show_help
+            ;;
+        *)
+            die_with_help "Unknown command: $command"
+            ;;
+    esac
+}
+
+# Run main only if not being sourced
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
