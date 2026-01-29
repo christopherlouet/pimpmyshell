@@ -32,3 +32,8 @@ coverage/
 
 # Temp
 tmp/
+
+# Claude Code
+.claude/
+CLAUDE.md
+CLAUDE.local.md.example
