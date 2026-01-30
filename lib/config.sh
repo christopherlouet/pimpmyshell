@@ -18,12 +18,16 @@ fi
 
 readonly DEFAULT_CONFIG_FILE="${PIMPMYSHELL_CONFIG_DIR}/pimpmyshell.yaml"
 readonly DEFAULT_THEME="cyberpunk"
+# shellcheck disable=SC2034
 readonly DEFAULT_FRAMEWORK="ohmyzsh"
 readonly DEFAULT_PROMPT_ENGINE="starship"
 
-# Valid values for validation
+# Valid values for validation (used by validation.sh)
+# shellcheck disable=SC2034
 readonly VALID_FRAMEWORKS=("ohmyzsh" "prezto" "none")
+# shellcheck disable=SC2034
 readonly VALID_PROMPT_ENGINES=("starship" "p10k" "none")
+# shellcheck disable=SC2034
 readonly VALID_THEMES=("cyberpunk" "matrix" "dracula" "catppuccin" "nord" "gruvbox" "tokyo-night")
 
 # -----------------------------------------------------------------------------

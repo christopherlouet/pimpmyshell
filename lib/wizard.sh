@@ -459,7 +459,7 @@ _wizard_generate_config() {
         echo "  mise:"
         echo "    enabled: $mise_enabled"
         echo "  tmux:"
-        echo "    auto_start: false"
+        echo "    auto_start: $tmux_enabled"
         echo "  zoxide:"
         echo "    enabled: $zoxide_enabled"
         echo "  delta:"

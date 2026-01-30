@@ -27,6 +27,7 @@ if [[ -z "${NO_COLOR:-}" && -t 2 ]]; then
     DIM='\033[2m'
     RESET='\033[0m'
 else
+    # shellcheck disable=SC2034
     RED='' GREEN='' YELLOW='' BLUE='' MAGENTA='' CYAN='' BOLD='' DIM='' RESET=''
 fi
 

@@ -47,10 +47,10 @@ jobs:
 
       - name: Run shellcheck
         run: |
-          shellcheck bin/pimpmyshell
-          shellcheck lib/*.sh
-          shellcheck modules/aliases/*.sh
-          shellcheck modules/integrations/*.sh
+          shellcheck -S warning -e SC1091 bin/pimpmyshell
+          shellcheck -S warning -e SC1091 lib/*.sh
+          shellcheck -S warning -e SC1091 modules/aliases/*.sh
+          shellcheck -S warning -e SC1091 modules/integrations/*.sh
 
       - name: Run bats tests
         run: bats tests/

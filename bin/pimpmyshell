@@ -428,7 +428,7 @@ parse_global_options() {
                 shift
                 ;;
             --dry-run)
-                PIMPMYSHELL_DRY_RUN=true
+                export PIMPMYSHELL_DRY_RUN=true
                 shift
                 ;;
             --no-backup)
