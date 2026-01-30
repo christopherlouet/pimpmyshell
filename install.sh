@@ -52,7 +52,7 @@ success() {
 # Configuration
 # -----------------------------------------------------------------------------
 
-PIMPMYSHELL_VERSION="0.1.0"
+PIMPMYSHELL_VERSION="0.2.0"
 PIMPMYSHELL_REPO="https://github.com/christopherlouet/pimpmyshell.git"
 PIMPMYSHELL_INSTALL_DIR="${PIMPMYSHELL_INSTALL_DIR:-$HOME/.pimpmyshell}"
 PIMPMYSHELL_CONFIG_DIR="${PIMPMYSHELL_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/pimpmyshell}"

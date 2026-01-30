@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-01-30
+
+### Added
+
+- Live terminal color switching via OSC escape sequences (OSC 4/10/11) for instant theme changes
+- Zsh fpath-based completions for all pimpmyshell commands, themes, and profiles
+- Configurable fzf-tab integration (`integrations.fzf_tab.enabled`) - disabled by default
+- Pre-selection of all items in wizard multi-select prompts (gum and fallback modes)
+- Powerline filled style for all 7 Starship prompt themes with per-theme accent colors
+- 16-color ANSI palette in terminal-colors.sh for full theme consistency
+
+### Changed
+
+- Theme switching now applies colors immediately (OSC sequences) plus persists via dconf
+- Wizard no longer includes fzf-tab in custom plugin options by default
+- Updated README with new features, shell completions section, and current config options
+
+### Fixed
+
+- Wizard now respects `WIZARD_THEME` environment variable in auto mode
+- Added `~/.local/bin` to PATH in generated `.zshrc`
+- Theme accent colors correctly used in powerline prompt segments
+
 ## [0.1.0] - 2026-01-29
 
 ### Added
@@ -35,5 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD: GitHub Actions for tests (ubuntu + macos) and releases
 - 529+ BATS tests across all modules
 
-[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/christopherlouet/pimpmyshell/releases/tag/v0.1.0
