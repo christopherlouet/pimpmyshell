@@ -763,11 +763,11 @@ setup() {
     export PIMPMYSHELL_TOOLS_REGISTRY="$old_reg"
 }
 
-@test "WIZARD_TOOLS state variable exists" {
-    # The variable should be declared (possibly empty)
-    [[ -v WIZARD_TOOLS ]]
+@test "WIZARD_TOOLS state variable is set after sourcing wizard" {
+    # The variable should be declared (possibly empty) after sourcing wizard.sh
+    [[ "${WIZARD_TOOLS+x}" == "x" ]]
 }
 
-@test "WIZARD_PROFILE state variable exists" {
-    [[ -v WIZARD_PROFILE ]]
+@test "WIZARD_PROFILE state variable is set after sourcing wizard" {
+    [[ "${WIZARD_PROFILE+x}" == "x" ]]
 }
