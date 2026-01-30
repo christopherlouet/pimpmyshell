@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-01-30
+
+### Added
+
+- Multi-distro Linux support: Debian/Ubuntu, Fedora/RHEL, Arch, openSUSE, Alpine, macOS
+- `lib/distro.sh`: distribution detection (`get_distro_id`, `get_distro_family`, `get_distro_pretty`, `run_privileged`)
+- Multi-terminal theme support: GNOME Terminal, kitty, alacritty, Konsole, XFCE Terminal, WezTerm
+- Multi-Distro CI workflow (Fedora, Arch, openSUSE, Alpine) via Docker containers
+- `_parse_palette_colors()` helper in themes.sh for DRY palette parsing across 5 terminal backends
+
+### Fixed
+
+- `local status=$?` always capturing 0 in tools.sh — replaced with explicit error capture per case branch
+- Tool install now skips package manager when no package defined for the distro, falls back to alternative install directly
+- Single-quoted values in `/etc/os-release` now parsed correctly in `_read_os_release_field`
+- openSUSE CI prerequisites: added `gawk` and `findutils` missing from minimal image
+- `install.sh` `detect_package_manager` aligned with tools.sh (`apt` instead of `apt-get`, zypper before apk)
+
+### Changed
+
+- README rewritten with badges, supported platforms tables, tools registry, and project structure tree
+
 ## [0.3.0] - 2026-01-30
 
 ### Added
@@ -94,7 +116,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD: GitHub Actions for tests (ubuntu + macos) and releases
 - 529+ BATS tests across all modules
 
-[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/christopherlouet/pimpmyshell/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/christopherlouet/pimpmyshell/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.1.0...v0.2.0
