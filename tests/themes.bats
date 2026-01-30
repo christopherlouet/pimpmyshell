@@ -459,3 +459,153 @@ setup() {
     first_color=$(echo "$result" | tr -d "[]' " | cut -d',' -f1)
     [[ ${#first_color} -eq 13 ]]
 }
+
+# =============================================================================
+# detect_terminal
+# =============================================================================
+
+@test "detect_terminal function exists" {
+    declare -F detect_terminal
+}
+
+@test "detect_terminal returns a string" {
+    run detect_terminal
+    assert_success
+    [[ -n "$output" ]]
+}
+
+@test "detect_terminal detects kitty via TERM" {
+    TERM=xterm-kitty run detect_terminal
+    assert_success
+    assert_output_equals "kitty"
+}
+
+@test "detect_terminal detects alacritty via TERM" {
+    TERM=alacritty run detect_terminal
+    assert_success
+    assert_output_equals "alacritty"
+}
+
+@test "detect_terminal detects kitty via TERM_PROGRAM" {
+    TERM_PROGRAM=kitty run detect_terminal
+    assert_success
+    assert_output_equals "kitty"
+}
+
+@test "detect_terminal detects wezterm via TERM_PROGRAM" {
+    TERM_PROGRAM=WezTerm run detect_terminal
+    assert_success
+    assert_output_equals "wezterm"
+}
+
+@test "detect_terminal detects konsole via KONSOLE_VERSION" {
+    KONSOLE_VERSION=220401 run detect_terminal
+    assert_success
+    assert_output_equals "konsole"
+}
+
+# =============================================================================
+# _generate_kitty_theme - config generation
+# =============================================================================
+
+@test "_generate_kitty_theme function exists" {
+    declare -F _generate_kitty_theme
+}
+
+@test "_generate_kitty_theme produces valid kitty config" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    load_theme "cyberpunk"
+    run _generate_kitty_theme
+    assert_success
+    assert_output_contains "foreground"
+    assert_output_contains "background"
+    assert_output_contains "color0"
+}
+
+# =============================================================================
+# _generate_alacritty_theme - config generation
+# =============================================================================
+
+@test "_generate_alacritty_theme function exists" {
+    declare -F _generate_alacritty_theme
+}
+
+@test "_generate_alacritty_theme produces valid TOML" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    load_theme "cyberpunk"
+    run _generate_alacritty_theme
+    assert_success
+    assert_output_contains "[colors.primary]"
+    assert_output_contains "foreground"
+    assert_output_contains "background"
+}
+
+# =============================================================================
+# _generate_konsole_theme - config generation
+# =============================================================================
+
+@test "_generate_konsole_theme function exists" {
+    declare -F _generate_konsole_theme
+}
+
+@test "_generate_konsole_theme produces valid colorscheme" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    load_theme "cyberpunk"
+    run _generate_konsole_theme
+    assert_success
+    assert_output_contains "[General]"
+    assert_output_contains "[Foreground]"
+    assert_output_contains "[Background]"
+    assert_output_contains "[Color0]"
+}
+
+# =============================================================================
+# _apply_kitty_theme - writes config file
+# =============================================================================
+
+@test "_apply_kitty_theme writes config file" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    load_theme "cyberpunk"
+    local kitty_dir="${PIMPMYSHELL_TEST_DIR}/kitty"
+    mkdir -p "$kitty_dir"
+    XDG_CONFIG_HOME="${PIMPMYSHELL_TEST_DIR}" run _apply_kitty_theme
+    assert_success
+}
+
+# =============================================================================
+# _apply_alacritty_theme - writes config file
+# =============================================================================
+
+@test "_apply_alacritty_theme writes config file" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    load_theme "cyberpunk"
+    local alacritty_dir="${PIMPMYSHELL_TEST_DIR}/alacritty"
+    mkdir -p "$alacritty_dir"
+    XDG_CONFIG_HOME="${PIMPMYSHELL_TEST_DIR}" run _apply_alacritty_theme
+    assert_success
+}
+
+# =============================================================================
+# _apply_konsole_theme - writes config file
+# =============================================================================
+
+@test "_apply_konsole_theme writes colorscheme file" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    load_theme "cyberpunk"
+    local konsole_dir="${PIMPMYSHELL_TEST_DIR}/konsole"
+    mkdir -p "$konsole_dir"
+    XDG_DATA_HOME="${PIMPMYSHELL_TEST_DIR}" run _apply_konsole_theme
+    assert_success
+}

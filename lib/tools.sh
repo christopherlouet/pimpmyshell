@@ -20,12 +20,17 @@ if [[ -z "${_PIMPMYSHELL_CONFIG_LOADED:-}" ]]; then
     source "${PIMPMYSHELL_LIB_DIR:-$(dirname "${BASH_SOURCE[0]}")}/config.sh"
 fi
 
+if [[ -z "${_PIMPMYSHELL_DISTRO_LOADED:-}" ]]; then
+    # shellcheck source=./distro.sh
+    source "${PIMPMYSHELL_LIB_DIR:-$(dirname "${BASH_SOURCE[0]}")}/distro.sh"
+fi
+
 # -----------------------------------------------------------------------------
 # Package Manager Detection
 # -----------------------------------------------------------------------------
 
 ## Detect the system package manager
-## Returns: apt, dnf, pacman, brew, or unknown
+## Returns: apt, dnf, pacman, zypper, apk, brew, or unknown
 detect_pkg_manager() {
     if check_command brew; then
         echo "brew"
@@ -35,6 +40,10 @@ detect_pkg_manager() {
         echo "dnf"
     elif check_command pacman; then
         echo "pacman"
+    elif check_command zypper; then
+        echo "zypper"
+    elif check_command apk; then
+        echo "apk"
     else
         echo "unknown"
     fi
@@ -220,13 +229,19 @@ install_tool() {
 
     case "$pkg_manager" in
         apt)
-            sudo apt install -y "$pkg_name"
+            run_privileged apt install -y "$pkg_name"
             ;;
         dnf)
-            sudo dnf install -y "$pkg_name"
+            run_privileged dnf install -y "$pkg_name"
             ;;
         pacman)
-            sudo pacman -S --noconfirm "$pkg_name"
+            run_privileged pacman -S --noconfirm "$pkg_name"
+            ;;
+        zypper)
+            run_privileged zypper install -y "$pkg_name"
+            ;;
+        apk)
+            run_privileged apk add "$pkg_name"
             ;;
         brew)
             brew install "$pkg_name"

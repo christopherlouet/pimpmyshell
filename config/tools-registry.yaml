@@ -11,6 +11,8 @@ tools:
       apt: bat
       dnf: bat
       pacman: bat
+      zypper: bat
+      apk: bat
       brew: bat
     alt_install: "cargo install bat"
 
@@ -22,6 +24,8 @@ tools:
       apt: fd-find
       dnf: fd-find
       pacman: fd
+      zypper: fd
+      apk: fd
       brew: fd
     alt_install: "cargo install fd-find"
 
@@ -31,6 +35,8 @@ tools:
       apt: ripgrep
       dnf: ripgrep
       pacman: ripgrep
+      zypper: ripgrep
+      apk: ripgrep
       brew: ripgrep
     alt_install: "cargo install ripgrep"
 
@@ -40,6 +46,8 @@ tools:
       apt: git-delta
       dnf: git-delta
       pacman: git-delta
+      zypper: git-delta
+      apk: git-delta
       brew: git-delta
     alt_install: "cargo install git-delta"
 
@@ -49,6 +57,8 @@ tools:
       apt: eza
       dnf: eza
       pacman: eza
+      zypper: eza
+      apk: eza
       brew: eza
     alt_install: "cargo install eza"
 
@@ -58,6 +68,8 @@ tools:
       apt: zoxide
       dnf: zoxide
       pacman: zoxide
+      zypper: zoxide
+      apk: zoxide
       brew: zoxide
     alt_install: "cargo install zoxide"
 
@@ -67,6 +79,8 @@ tools:
       apt: dust
       dnf: dust
       pacman: dust
+      zypper: dust
+      apk: dust
       brew: dust
     alt_install: "cargo install du-dust"
 
@@ -76,6 +90,8 @@ tools:
       apt: hyperfine
       dnf: hyperfine
       pacman: hyperfine
+      zypper: hyperfine
+      apk: hyperfine
       brew: hyperfine
     alt_install: "cargo install hyperfine"
 
@@ -83,6 +99,8 @@ tools:
     command: starship
     packages:
       apt: starship
+      dnf: starship
+      pacman: starship
       brew: starship
     alt_install: "curl -sS https://starship.rs/install.sh | sh"
 
@@ -92,6 +110,8 @@ tools:
       apt: tldr
       dnf: tldr
       pacman: tldr
+      zypper: tealdeer
+      apk: tealdeer
       brew: tldr
     alt_install: "npm install -g tldr"
 
@@ -101,5 +121,7 @@ tools:
       apt: fzf
       dnf: fzf
       pacman: fzf
+      zypper: fzf
+      apk: fzf
       brew: fzf
     alt_install: "git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install"

@@ -29,7 +29,7 @@ setup() {
 @test "detect_pkg_manager returns a valid package manager" {
     run detect_pkg_manager
     assert_success
-    [[ "$output" =~ ^(apt|dnf|pacman|brew|unknown)$ ]]
+    [[ "$output" =~ ^(apt|dnf|pacman|zypper|apk|brew|unknown)$ ]]
 }
 
 @test "detect_pkg_manager returns apt on Debian/Ubuntu" {
@@ -48,6 +48,24 @@ setup() {
     run detect_pkg_manager
     assert_success
     assert_output_contains "brew"
+}
+
+@test "detect_pkg_manager returns zypper on openSUSE" {
+    if ! command -v zypper &>/dev/null; then
+        skip "zypper not available"
+    fi
+    run detect_pkg_manager
+    assert_success
+    assert_output_contains "zypper"
+}
+
+@test "detect_pkg_manager returns apk on Alpine" {
+    if ! command -v apk &>/dev/null; then
+        skip "apk not available"
+    fi
+    run detect_pkg_manager
+    assert_success
+    assert_output_contains "apk"
 }
 
 # =============================================================================
@@ -447,4 +465,118 @@ setup() {
     run get_tool_alt_install "fzf"
     assert_success
     assert_output_contains "fzf"
+}
+
+# =============================================================================
+# zypper/apk package name resolution
+# =============================================================================
+
+@test "get_tool_pkg_name returns correct zypper package for fd" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_pkg_name "fd" "zypper"
+    assert_success
+    assert_output_equals "fd"
+}
+
+@test "get_tool_pkg_name returns correct zypper package for delta" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_pkg_name "delta" "zypper"
+    assert_success
+    assert_output_equals "git-delta"
+}
+
+@test "get_tool_pkg_name returns correct apk package for fd" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_pkg_name "fd" "apk"
+    assert_success
+    assert_output_equals "fd"
+}
+
+@test "get_tool_pkg_name returns correct apk package for delta" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_pkg_name "delta" "apk"
+    assert_success
+    assert_output_equals "git-delta"
+}
+
+# =============================================================================
+# Tools Registry: zypper/apk keys present for all tools
+# =============================================================================
+
+@test "tools-registry.yaml has zypper package for bat" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run _tools_registry_get ".tools.bat.packages.zypper"
+    assert_success
+    [[ -n "$output" ]]
+}
+
+@test "tools-registry.yaml has apk package for bat" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run _tools_registry_get ".tools.bat.packages.apk"
+    assert_success
+    [[ -n "$output" ]]
+}
+
+@test "tools-registry.yaml has zypper package for fzf" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run _tools_registry_get ".tools.fzf.packages.zypper"
+    assert_success
+    [[ -n "$output" ]]
+}
+
+@test "tools-registry.yaml has apk package for fzf" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run _tools_registry_get ".tools.fzf.packages.apk"
+    assert_success
+    [[ -n "$output" ]]
+}
+
+@test "tools-registry.yaml has zypper or alt_install for all tools" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    local tools="bat fd ripgrep delta eza zoxide dust hyperfine starship tldr fzf"
+    for tool in $tools; do
+        local zypper_pkg
+        zypper_pkg=$(_tools_registry_get ".tools.${tool}.packages.zypper")
+        local alt_install
+        alt_install=$(_tools_registry_get ".tools.${tool}.alt_install")
+        if [[ -z "$zypper_pkg" && -z "$alt_install" ]]; then
+            echo "Tool $tool has neither zypper package nor alt_install"
+            return 1
+        fi
+    done
+}
+
+@test "tools-registry.yaml has apk or alt_install for all tools" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    local tools="bat fd ripgrep delta eza zoxide dust hyperfine starship tldr fzf"
+    for tool in $tools; do
+        local apk_pkg
+        apk_pkg=$(_tools_registry_get ".tools.${tool}.packages.apk")
+        local alt_install
+        alt_install=$(_tools_registry_get ".tools.${tool}.alt_install")
+        if [[ -z "$apk_pkg" && -z "$alt_install" ]]; then
+            echo "Tool $tool has neither apk package nor alt_install"
+            return 1
+        fi
+    done
 }

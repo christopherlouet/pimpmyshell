@@ -1,0 +1,46 @@
+name: Multi-Distro Tests
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  test-distro:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro:
+          - { image: "fedora:latest", pkg_install: "dnf install -y bash bats git" }
+          - { image: "archlinux:latest", pkg_install: "pacman -Sy --noconfirm bash bats git" }
+          - { image: "opensuse/tumbleweed:latest", pkg_install: "zypper install -y bash bats git" }
+          - { image: "alpine:latest", pkg_install: "apk add bash bats git" }
+      fail-fast: false
+    container:
+      image: ${{ matrix.distro.image }}
+
+    steps:
+      - name: Install prerequisites
+        run: ${{ matrix.distro.pkg_install }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        run: |
+          arch=$(uname -m)
+          case "$arch" in
+            x86_64) arch="amd64" ;;
+            aarch64|arm64) arch="arm64" ;;
+          esac
+          url="https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${arch}"
+          if command -v wget &>/dev/null; then
+            wget -qO /usr/local/bin/yq "$url"
+          elif command -v curl &>/dev/null; then
+            curl -fsSL -o /usr/local/bin/yq "$url"
+          fi
+          chmod +x /usr/local/bin/yq
+
+      - name: Run bats tests
+        run: bats tests/

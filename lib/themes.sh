@@ -197,6 +197,246 @@ load_theme() {
 }
 
 # -----------------------------------------------------------------------------
+# Terminal Detection
+# -----------------------------------------------------------------------------
+
+## Detect the current terminal emulator
+## Returns: gnome-terminal, konsole, xfce4-terminal, kitty, alacritty, wezterm, or unknown
+detect_terminal() {
+    # Check TERM first (most reliable for some terminals)
+    case "${TERM:-}" in
+        xterm-kitty)    echo "kitty"; return ;;
+        alacritty)      echo "alacritty"; return ;;
+    esac
+
+    # Check TERM_PROGRAM (set by many modern terminals)
+    case "${TERM_PROGRAM:-}" in
+        kitty)          echo "kitty"; return ;;
+        alacritty)      echo "alacritty"; return ;;
+        WezTerm)        echo "wezterm"; return ;;
+    esac
+
+    # Check terminal-specific environment variables
+    if [[ -n "${KONSOLE_VERSION:-}" ]]; then
+        echo "konsole"
+        return
+    fi
+
+    if [[ -n "${XFCE_TERMINAL_VERSION:-}" ]]; then
+        echo "xfce4-terminal"
+        return
+    fi
+
+    # Check for GNOME Terminal via dconf
+    if check_command dconf && dconf list /org/gnome/terminal/legacy/profiles:/ &>/dev/null 2>&1; then
+        echo "gnome-terminal"
+        return
+    fi
+
+    echo "unknown"
+}
+
+# -----------------------------------------------------------------------------
+# Theme Generation (config file content)
+# -----------------------------------------------------------------------------
+
+## Generate kitty theme config content
+## Requires: THEME_FG, THEME_BG, THEME_PALETTE to be set
+## Usage: _generate_kitty_theme
+_generate_kitty_theme() {
+    echo "# pimpmyshell theme: ${THEME_NAME:-unknown}"
+    echo "foreground ${THEME_FG}"
+    echo "background ${THEME_BG}"
+    echo "selection_foreground ${THEME_FG}"
+    echo "selection_background ${THEME_SELECTION:-#333355}"
+
+    # Parse palette if available
+    if [[ -n "${THEME_PALETTE:-}" ]]; then
+        local cleaned i=0
+        cleaned=$(echo "$THEME_PALETTE" | tr -d "[]'" | tr ',' '\n')
+        while IFS= read -r color; do
+            color=$(echo "$color" | tr -d ' ')
+            [[ -z "$color" ]] && continue
+            # Convert #RRRRGGGGBBBB to #RRGGBB
+            if [[ ${#color} -eq 13 ]]; then
+                color="#${color:1:2}${color:5:2}${color:9:2}"
+            fi
+            echo "color${i} ${color}"
+            ((i++))
+            [[ $i -ge 16 ]] && break
+        done <<< "$cleaned"
+    fi
+}
+
+## Generate alacritty theme config content (TOML format)
+## Requires: THEME_FG, THEME_BG, THEME_PALETTE to be set
+## Usage: _generate_alacritty_theme
+_generate_alacritty_theme() {
+    echo "# pimpmyshell theme: ${THEME_NAME:-unknown}"
+    echo ""
+    echo "[colors.primary]"
+    echo "foreground = \"${THEME_FG}\""
+    echo "background = \"${THEME_BG}\""
+
+    # Parse palette for normal and bright colors
+    if [[ -n "${THEME_PALETTE:-}" ]]; then
+        local cleaned colors=()
+        cleaned=$(echo "$THEME_PALETTE" | tr -d "[]'" | tr ',' '\n')
+        while IFS= read -r color; do
+            color=$(echo "$color" | tr -d ' ')
+            [[ -z "$color" ]] && continue
+            if [[ ${#color} -eq 13 ]]; then
+                color="#${color:1:2}${color:5:2}${color:9:2}"
+            fi
+            colors+=("$color")
+        done <<< "$cleaned"
+
+        if [[ ${#colors[@]} -ge 8 ]]; then
+            echo ""
+            echo "[colors.normal]"
+            echo "black   = \"${colors[0]}\""
+            echo "red     = \"${colors[1]}\""
+            echo "green   = \"${colors[2]}\""
+            echo "yellow  = \"${colors[3]}\""
+            echo "blue    = \"${colors[4]}\""
+            echo "magenta = \"${colors[5]}\""
+            echo "cyan    = \"${colors[6]}\""
+            echo "white   = \"${colors[7]}\""
+        fi
+
+        if [[ ${#colors[@]} -ge 16 ]]; then
+            echo ""
+            echo "[colors.bright]"
+            echo "black   = \"${colors[8]}\""
+            echo "red     = \"${colors[9]}\""
+            echo "green   = \"${colors[10]}\""
+            echo "yellow  = \"${colors[11]}\""
+            echo "blue    = \"${colors[12]}\""
+            echo "magenta = \"${colors[13]}\""
+            echo "cyan    = \"${colors[14]}\""
+            echo "white   = \"${colors[15]}\""
+        fi
+    fi
+}
+
+## Convert hex color #RRGGBB to R,G,B decimal values
+## Usage: _hex_to_rgb <hex_color>
+_hex_to_rgb() {
+    local hex="${1#\#}"
+    # Handle #RRRRGGGGBBBB (dconf format)
+    if [[ ${#hex} -eq 12 ]]; then
+        hex="${hex:0:2}${hex:4:2}${hex:8:2}"
+    fi
+    local r=$((16#${hex:0:2}))
+    local g=$((16#${hex:2:2}))
+    local b=$((16#${hex:4:2}))
+    echo "${r},${g},${b}"
+}
+
+## Generate KDE Konsole colorscheme content
+## Requires: THEME_FG, THEME_BG, THEME_PALETTE to be set
+## Usage: _generate_konsole_theme
+_generate_konsole_theme() {
+    echo "[General]"
+    echo "Description=${THEME_NAME:-pimpmyshell}"
+    echo "Opacity=1"
+    echo ""
+    echo "[Foreground]"
+    echo "Color=$(_hex_to_rgb "$THEME_FG")"
+    echo ""
+    echo "[Background]"
+    echo "Color=$(_hex_to_rgb "$THEME_BG")"
+
+    # Parse palette for color slots
+    if [[ -n "${THEME_PALETTE:-}" ]]; then
+        local cleaned colors=()
+        cleaned=$(echo "$THEME_PALETTE" | tr -d "[]'" | tr ',' '\n')
+        while IFS= read -r color; do
+            color=$(echo "$color" | tr -d ' ')
+            [[ -z "$color" ]] && continue
+            colors+=("$color")
+        done <<< "$cleaned"
+
+        local i
+        for i in "${!colors[@]}"; do
+            [[ $i -ge 16 ]] && break
+            local rgb
+            rgb=$(_hex_to_rgb "${colors[$i]}")
+            echo ""
+            echo "[Color${i}]"
+            echo "Color=${rgb}"
+        done
+    fi
+}
+
+# -----------------------------------------------------------------------------
+# Theme Application (write config files)
+# -----------------------------------------------------------------------------
+
+## Apply kitty theme by writing config file
+## Usage: _apply_kitty_theme
+_apply_kitty_theme() {
+    local kitty_dir="${XDG_CONFIG_HOME:-$HOME/.config}/kitty"
+    local theme_file="${kitty_dir}/current-theme.conf"
+
+    mkdir -p "$kitty_dir"
+    _generate_kitty_theme > "$theme_file"
+    log_verbose "Wrote kitty theme: $theme_file"
+
+    # Apply immediately if kitty remote control is available
+    if check_command kitty && [[ -n "${KITTY_PID:-}" ]]; then
+        kitty @ set-colors --all "$theme_file" 2>/dev/null || true
+        log_verbose "Applied kitty colors via remote control"
+    fi
+}
+
+## Apply alacritty theme by writing config file
+## Usage: _apply_alacritty_theme
+_apply_alacritty_theme() {
+    local alacritty_dir="${XDG_CONFIG_HOME:-$HOME/.config}/alacritty"
+    local theme_file="${alacritty_dir}/pimpmyshell-theme.toml"
+
+    mkdir -p "$alacritty_dir"
+    _generate_alacritty_theme > "$theme_file"
+    log_verbose "Wrote alacritty theme: $theme_file"
+
+    # Check if main config imports the theme file
+    local main_config="${alacritty_dir}/alacritty.toml"
+    if [[ -f "$main_config" ]]; then
+        if ! grep -q "pimpmyshell-theme.toml" "$main_config" 2>/dev/null; then
+            log_info "Add to ${main_config}:"
+            log_info '  [general]'
+            log_info '  import = ["~/.config/alacritty/pimpmyshell-theme.toml"]'
+        fi
+    fi
+}
+
+## Apply KDE Konsole theme by writing colorscheme file
+## Usage: _apply_konsole_theme
+_apply_konsole_theme() {
+    local konsole_dir="${XDG_DATA_HOME:-$HOME/.local/share}/konsole"
+    local scheme_file="${konsole_dir}/${THEME_NAME:-pimpmyshell}.colorscheme"
+
+    mkdir -p "$konsole_dir"
+    _generate_konsole_theme > "$scheme_file"
+    log_verbose "Wrote Konsole colorscheme: $scheme_file"
+}
+
+## Apply XFCE Terminal theme via xfconf-query
+## Usage: _apply_xfce_terminal_theme
+_apply_xfce_terminal_theme() {
+    if ! check_command xfconf-query; then
+        log_warn "xfconf-query not available, cannot apply XFCE Terminal theme"
+        return 1
+    fi
+
+    local channel="xfce4-terminal"
+    xfconf-query -c "$channel" -p /color-foreground -s "$THEME_FG" 2>/dev/null || true
+    xfconf-query -c "$channel" -p /color-background -s "$THEME_BG" 2>/dev/null || true
+    log_verbose "Applied XFCE Terminal colors"
+}
+
+# -----------------------------------------------------------------------------
 # Theme application functions
 # -----------------------------------------------------------------------------
 
@@ -243,11 +483,29 @@ _apply_osc_palette() {
 }
 
 ## Apply terminal foreground and background colors
-## Uses OSC escape codes for immediate effect + GNOME dconf for persistence
+## Uses OSC escape codes for immediate effect + terminal-specific config for persistence
 ## Usage: apply_terminal_colors
 ## Requires: THEME_BG, THEME_FG, THEME_NAME, THEME_PALETTE to be set (via load_theme)
 apply_terminal_colors() {
     local profile_id=""
+    local terminal
+    terminal=$(detect_terminal)
+
+    # 0. Terminal-specific persistent config
+    case "$terminal" in
+        kitty)
+            _apply_kitty_theme
+            ;;
+        alacritty)
+            _apply_alacritty_theme
+            ;;
+        konsole)
+            _apply_konsole_theme
+            ;;
+        xfce4-terminal)
+            _apply_xfce_terminal_theme
+            ;;
+    esac
 
     # 1. Tmux: set pane fg/bg for immediate effect
     if [[ -n "${TMUX:-}" ]] && check_command tmux; then

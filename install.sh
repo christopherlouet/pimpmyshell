@@ -153,9 +153,11 @@ check_prerequisites() {
                 echo "  zsh is included with macOS"
                 ;;
             linux|wsl)
-                echo "  sudo apt install zsh    # Debian/Ubuntu"
-                echo "  sudo dnf install zsh    # Fedora"
-                echo "  sudo pacman -S zsh      # Arch"
+                echo "  sudo apt install zsh       # Debian/Ubuntu"
+                echo "  sudo dnf install zsh       # Fedora/RHEL"
+                echo "  sudo pacman -S zsh         # Arch"
+                echo "  sudo zypper install zsh    # openSUSE"
+                echo "  sudo apk add zsh           # Alpine"
                 ;;
         esac
         echo ""
@@ -177,9 +179,11 @@ check_prerequisites() {
                 echo "  brew install ${missing[*]}"
                 ;;
             linux|wsl)
-                echo "  sudo apt install ${missing[*]}    # Debian/Ubuntu"
-                echo "  sudo dnf install ${missing[*]}    # Fedora"
-                echo "  sudo pacman -S ${missing[*]}      # Arch"
+                echo "  sudo apt install ${missing[*]}       # Debian/Ubuntu"
+                echo "  sudo dnf install ${missing[*]}       # Fedora/RHEL"
+                echo "  sudo pacman -S ${missing[*]}         # Arch"
+                echo "  sudo zypper install ${missing[*]}    # openSUSE"
+                echo "  sudo apk add ${missing[*]}           # Alpine"
                 ;;
         esac
         return 1
@@ -233,10 +237,32 @@ install_yq() {
         [[ "$(get_platform)" == "macos" ]] && os="darwin"
 
         local url="https://github.com/mikefarah/yq/releases/latest/download/yq_${os}_${arch}"
-        local dest="/usr/local/bin/yq"
 
-        if sudo wget -qO "$dest" "$url" 2>/dev/null || sudo curl -fsSL -o "$dest" "$url" 2>/dev/null; then
-            sudo chmod +x "$dest"
+        # Prefer /usr/local/bin if writable, otherwise use ~/.local/bin
+        local dest="/usr/local/bin/yq"
+        local use_sudo=true
+        if [[ ! -w "/usr/local/bin" ]]; then
+            if [[ "$(id -u)" -ne 0 ]]; then
+                dest="${HOME}/.local/bin/yq"
+                use_sudo=false
+                mkdir -p "${HOME}/.local/bin"
+            fi
+        fi
+
+        local download_ok=false
+        if [[ "$use_sudo" == true ]]; then
+            if sudo wget -qO "$dest" "$url" 2>/dev/null || sudo curl -fsSL -o "$dest" "$url" 2>/dev/null; then
+                sudo chmod +x "$dest"
+                download_ok=true
+            fi
+        else
+            if wget -qO "$dest" "$url" 2>/dev/null || curl -fsSL -o "$dest" "$url" 2>/dev/null; then
+                chmod +x "$dest"
+                download_ok=true
+            fi
+        fi
+
+        if [[ "$download_ok" == true ]]; then
             success "Installed yq to $dest"
         else
             error "Failed to download yq"
