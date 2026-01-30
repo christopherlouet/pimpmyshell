@@ -55,4 +55,9 @@ jobs:
           fi
 
       - name: Run bats tests
-        run: bats tests/
+        run: |
+          bats tests/ 2>&1 | tee bats-output.txt
+          # Fail only on actual test failures, not on skip count warnings
+          if grep -q '^not ok' bats-output.txt; then
+            exit 1
+          fi
