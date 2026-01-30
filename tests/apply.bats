@@ -565,3 +565,100 @@ TESTEOF
     # No {PLACEHOLDER} patterns should remain (grep returns 1 when no match = success)
     ! grep -qE '\{(VERSION|DATE|THEME|ENV_VARS|OMZ_CONFIG|PLUGINS|EZA_THEME|ALIASES|INTEGRATIONS|PROMPT_INIT|USER_CUSTOM)\}' "$output_file"
 }
+
+# =============================================================================
+# zshrc-gen edge cases
+# =============================================================================
+
+@test "_generate_terminal_colors produces source line" {
+    run _generate_terminal_colors
+    assert_success
+    assert_output_contains "terminal-colors.sh"
+    assert_output_contains "source"
+}
+
+@test "_generate_eza_theme produces source line" {
+    run _generate_eza_theme
+    assert_success
+    assert_output_contains "eza-theme.sh"
+    assert_output_contains "source"
+}
+
+@test "_generate_shell_wrapper produces pimpmyshell function" {
+    run _generate_shell_wrapper
+    assert_success
+    assert_output_contains "pimpmyshell()"
+}
+
+@test "_generate_completions produces fpath line when dir exists" {
+    mkdir -p "${PIMPMYSHELL_ROOT}/completions"
+    run _generate_completions
+    assert_success
+    assert_output_contains "fpath="
+}
+
+@test "_generate_completions returns empty when dir missing" {
+    export PIMPMYSHELL_ROOT="${PIMPMYSHELL_TEST_DIR}/no-completions"
+    mkdir -p "$PIMPMYSHELL_ROOT"
+    run _generate_completions
+    assert_success
+    [[ -z "$output" ]]
+}
+
+@test "generate_zshrc fails with missing template" {
+    export PIMPMYSHELL_TEMPLATES_DIR="${PIMPMYSHELL_TEST_DIR}/no-templates"
+    mkdir -p "$PIMPMYSHELL_TEMPLATES_DIR"
+    run generate_zshrc "${PIMPMYSHELL_TEST_DIR}/output.zshrc"
+    assert_failure
+    assert_output_contains "Template not found"
+}
+
+@test "extract_user_custom returns empty for file without markers" {
+    local file="${PIMPMYSHELL_TEST_DIR}/no-markers.zshrc"
+    echo "export FOO=bar" > "$file"
+    run extract_user_custom "$file"
+    assert_success
+    [[ -z "$output" ]]
+}
+
+@test "_generate_omz_config sets robbyrussell when prompt engine is none" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    local config_file="${PIMPMYSHELL_CONFIG_DIR}/pimpmyshell.yaml"
+    cat > "$config_file" << 'EOF'
+theme: cyberpunk
+prompt:
+  engine: none
+EOF
+    export PIMPMYSHELL_CONFIG_FILE="$config_file"
+
+    run _generate_omz_config
+    assert_success
+    assert_output_contains 'ZSH_THEME="robbyrussell"'
+}
+
+@test "_generate_plugins_line skips fzf-tab when disabled" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    local config_file="${PIMPMYSHELL_CONFIG_DIR}/pimpmyshell.yaml"
+    cat > "$config_file" << 'EOF'
+plugins:
+  ohmyzsh:
+    - git
+  custom:
+    - zsh-autosuggestions
+    - fzf-tab
+integrations:
+  fzf_tab:
+    enabled: false
+EOF
+    export PIMPMYSHELL_CONFIG_FILE="$config_file"
+
+    run _generate_plugins_line
+    assert_success
+    assert_output_contains "git"
+    assert_output_contains "zsh-autosuggestions"
+    refute_output_contains "fzf-tab"
+}

@@ -1,0 +1,105 @@
+# pimpmyshell - Tools registry
+# Defines tool metadata: command resolution, package names, alternative installs.
+# Used by lib/tools.sh for data-driven tool management.
+
+tools:
+  bat:
+    commands:
+      - bat
+      - batcat
+    packages:
+      apt: bat
+      dnf: bat
+      pacman: bat
+      brew: bat
+    alt_install: "cargo install bat"
+
+  fd:
+    commands:
+      - fd
+      - fdfind
+    packages:
+      apt: fd-find
+      dnf: fd-find
+      pacman: fd
+      brew: fd
+    alt_install: "cargo install fd-find"
+
+  ripgrep:
+    command: rg
+    packages:
+      apt: ripgrep
+      dnf: ripgrep
+      pacman: ripgrep
+      brew: ripgrep
+    alt_install: "cargo install ripgrep"
+
+  delta:
+    command: delta
+    packages:
+      apt: git-delta
+      dnf: git-delta
+      pacman: git-delta
+      brew: git-delta
+    alt_install: "cargo install git-delta"
+
+  eza:
+    command: eza
+    packages:
+      apt: eza
+      dnf: eza
+      pacman: eza
+      brew: eza
+    alt_install: "cargo install eza"
+
+  zoxide:
+    command: zoxide
+    packages:
+      apt: zoxide
+      dnf: zoxide
+      pacman: zoxide
+      brew: zoxide
+    alt_install: "cargo install zoxide"
+
+  dust:
+    command: dust
+    packages:
+      apt: dust
+      dnf: dust
+      pacman: dust
+      brew: dust
+    alt_install: "cargo install du-dust"
+
+  hyperfine:
+    command: hyperfine
+    packages:
+      apt: hyperfine
+      dnf: hyperfine
+      pacman: hyperfine
+      brew: hyperfine
+    alt_install: "cargo install hyperfine"
+
+  starship:
+    command: starship
+    packages:
+      apt: starship
+      brew: starship
+    alt_install: "curl -sS https://starship.rs/install.sh | sh"
+
+  tldr:
+    command: tldr
+    packages:
+      apt: tldr
+      dnf: tldr
+      pacman: tldr
+      brew: tldr
+    alt_install: "npm install -g tldr"
+
+  fzf:
+    command: fzf
+    packages:
+      apt: fzf
+      dnf: fzf
+      pacman: fzf
+      brew: fzf
+    alt_install: "git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install"

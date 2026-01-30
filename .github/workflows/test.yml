@@ -7,6 +7,23 @@ on:
     branches: [main, master, develop]
 
 jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+
+      - name: Run shellcheck
+        run: |
+          shellcheck -S warning -e SC1091 bin/pimpmyshell
+          shellcheck -S warning -e SC1091 install.sh
+          shellcheck -S warning -e SC1091 lib/*.sh
+          shellcheck -S warning -e SC1091 modules/aliases/*.sh
+          shellcheck -S warning -e SC1091 modules/integrations/*.sh
+
   test:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -36,21 +53,6 @@ jobs:
           else
             brew install yq
           fi
-
-      - name: Install shellcheck
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo apt-get install -y shellcheck
-          else
-            brew install shellcheck
-          fi
-
-      - name: Run shellcheck
-        run: |
-          shellcheck -S warning -e SC1091 bin/pimpmyshell
-          shellcheck -S warning -e SC1091 lib/*.sh
-          shellcheck -S warning -e SC1091 modules/aliases/*.sh
-          shellcheck -S warning -e SC1091 modules/integrations/*.sh
 
       - name: Run bats tests
         run: bats tests/

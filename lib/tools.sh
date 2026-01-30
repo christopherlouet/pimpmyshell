@@ -41,46 +41,73 @@ detect_pkg_manager() {
 }
 
 # -----------------------------------------------------------------------------
+# Tools Registry
+# -----------------------------------------------------------------------------
+
+PIMPMYSHELL_TOOLS_REGISTRY="${PIMPMYSHELL_TOOLS_REGISTRY:-${PIMPMYSHELL_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}/config/tools-registry.yaml}"
+
+## Read a value from the tools registry
+## Usage: _tools_registry_get <yq_path>
+## Returns: value or empty string
+_tools_registry_get() {
+    local yq_path="$1"
+
+    if [[ ! -f "$PIMPMYSHELL_TOOLS_REGISTRY" ]]; then
+        echo ""
+        return
+    fi
+
+    if ! check_command yq; then
+        echo ""
+        return
+    fi
+
+    local result
+    result=$(yq eval "$yq_path" "$PIMPMYSHELL_TOOLS_REGISTRY" 2>/dev/null)
+    if [[ "$result" == "null" || -z "$result" ]]; then
+        echo ""
+    else
+        echo "$result"
+    fi
+}
+
+# -----------------------------------------------------------------------------
 # Tool Command Resolution
 # -----------------------------------------------------------------------------
 
 ## Get the actual command name for a tool
-## Some tools have different command names on different systems
+## Reads from tools-registry.yaml, trying each command alias in order
 ## Usage: get_tool_command <tool_name>
 get_tool_command() {
     _require_args "get_tool_command" 1 $# || return 1
     local tool_name="$1"
-    case "$tool_name" in
-        bat)
-            # Debian/Ubuntu installs as 'batcat'
-            if check_command bat; then
-                echo "bat"
-            elif check_command batcat; then
-                echo "batcat"
-            else
-                echo "bat"
+
+    # Try registry: multi-command list (.commands[])
+    local commands
+    commands=$(_tools_registry_get ".tools.${tool_name}.commands[]")
+    if [[ -n "$commands" ]]; then
+        while IFS= read -r cmd; do
+            [[ -z "$cmd" ]] && continue
+            if check_command "$cmd"; then
+                echo "$cmd"
+                return
             fi
-            ;;
-        fd)
-            # Debian/Ubuntu installs as 'fdfind'
-            if check_command fd; then
-                echo "fd"
-            elif check_command fdfind; then
-                echo "fdfind"
-            else
-                echo "fd"
-            fi
-            ;;
-        ripgrep)
-            echo "rg"
-            ;;
-        delta)
-            echo "delta"
-            ;;
-        *)
-            echo "$tool_name"
-            ;;
-    esac
+        done <<< "$commands"
+        # None found, return first entry as default
+        echo "$commands" | head -1
+        return
+    fi
+
+    # Try registry: single command (.command)
+    local single_cmd
+    single_cmd=$(_tools_registry_get ".tools.${tool_name}.command")
+    if [[ -n "$single_cmd" ]]; then
+        echo "$single_cmd"
+        return
+    fi
+
+    # Fallback: tool name is the command
+    echo "$tool_name"
 }
 
 # -----------------------------------------------------------------------------
@@ -104,20 +131,16 @@ get_tool_pkg_name() {
     local tool_name="$1"
     local pkg_manager="$2"
 
-    case "${tool_name}:${pkg_manager}" in
-        fd:apt)         echo "fd-find" ;;
-        fd:dnf)         echo "fd-find" ;;
-        fd:pacman)      echo "fd" ;;
-        fd:brew)        echo "fd" ;;
-        delta:apt)      echo "git-delta" ;;
-        delta:dnf)      echo "git-delta" ;;
-        delta:pacman)   echo "git-delta" ;;
-        delta:brew)     echo "git-delta" ;;
-        ripgrep:*)      echo "ripgrep" ;;
-        dust:apt)       echo "dust" ;;
-        dust:brew)      echo "dust" ;;
-        *)              echo "$tool_name" ;;
-    esac
+    # Try registry
+    local pkg_name
+    pkg_name=$(_tools_registry_get ".tools.${tool_name}.packages.${pkg_manager}")
+    if [[ -n "$pkg_name" ]]; then
+        echo "$pkg_name"
+        return
+    fi
+
+    # Fallback: tool name is the package name
+    echo "$tool_name"
 }
 
 ## Get the alternative installation command for a tool
@@ -125,20 +148,17 @@ get_tool_pkg_name() {
 ## Returns: install command string or empty
 get_tool_alt_install() {
     local tool_name="$1"
-    case "$tool_name" in
-        eza)        echo "cargo install eza" ;;
-        bat)        echo "cargo install bat" ;;
-        fd)         echo "cargo install fd-find" ;;
-        ripgrep)    echo "cargo install ripgrep" ;;
-        zoxide)     echo "cargo install zoxide" ;;
-        delta)      echo "cargo install git-delta" ;;
-        dust)       echo "cargo install du-dust" ;;
-        hyperfine)  echo "cargo install hyperfine" ;;
-        starship)   echo "curl -sS https://starship.rs/install.sh | sh" ;;
-        tldr)       echo "npm install -g tldr" ;;
-        fzf)        echo "git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install" ;;
-        *)          echo "" ;;
-    esac
+
+    # Try registry
+    local alt_install
+    alt_install=$(_tools_registry_get ".tools.${tool_name}.alt_install")
+    if [[ -n "$alt_install" ]]; then
+        echo "$alt_install"
+        return
+    fi
+
+    # No alternative install method
+    echo ""
 }
 
 ## Install a tool using its alternative method (cargo, npm, git clone, etc.)

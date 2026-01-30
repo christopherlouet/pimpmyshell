@@ -23,6 +23,7 @@ set -euo pipefail
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
+# shellcheck disable=SC2034
 BLUE='\033[0;34m'
 MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
@@ -32,6 +33,7 @@ RESET='\033[0m'
 
 # Disable colors if not interactive
 if [[ ! -t 1 ]]; then
+    # shellcheck disable=SC2034
     RED='' GREEN='' YELLOW='' BLUE='' MAGENTA='' CYAN='' BOLD='' DIM='' RESET=''
 fi
 

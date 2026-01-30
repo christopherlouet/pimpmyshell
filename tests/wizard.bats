@@ -352,3 +352,62 @@ setup() {
     run cmd_wizard
     assert_success
 }
+
+# =============================================================================
+# Wizard edge cases
+# =============================================================================
+
+@test "_wizard_generate_config with empty plugins produces valid YAML" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    export WIZARD_THEME="cyberpunk"
+    export WIZARD_FRAMEWORK="ohmyzsh"
+    export WIZARD_PROMPT_ENGINE="starship"
+    export WIZARD_OMZ_PLUGINS=""
+    export WIZARD_CUSTOM_PLUGINS=""
+    export WIZARD_ALIAS_GROUPS=""
+    export WIZARD_ALIASES_ENABLED="false"
+
+    local config_file="${PIMPMYSHELL_TEST_DIR}/empty-plugins.yaml"
+    _wizard_generate_config "$config_file"
+    assert_file_exists "$config_file"
+
+    run yq eval '.' "$config_file"
+    assert_success
+}
+
+@test "_wizard_generate_config with empty integrations produces valid YAML" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    export WIZARD_THEME="dracula"
+    export WIZARD_FRAMEWORK="ohmyzsh"
+    export WIZARD_PROMPT_ENGINE="starship"
+    export WIZARD_OMZ_PLUGINS="git"
+    export WIZARD_CUSTOM_PLUGINS="zsh-autosuggestions"
+    export WIZARD_INTEGRATIONS=""
+    export WIZARD_ALIAS_GROUPS=""
+    export WIZARD_ALIASES_ENABLED="true"
+
+    local config_file="${PIMPMYSHELL_TEST_DIR}/empty-integ.yaml"
+    _wizard_generate_config "$config_file"
+    assert_file_exists "$config_file"
+
+    run yq eval '.' "$config_file"
+    assert_success
+}
+
+@test "run_wizard generates valid YAML in auto mode" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    export WIZARD_AUTO=1
+
+    run_wizard
+    local config_file="${PIMPMYSHELL_CONFIG_DIR}/pimpmyshell.yaml"
+    assert_file_exists "$config_file"
+
+    run yq eval '.' "$config_file"
+    assert_success
+}
