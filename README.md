@@ -3,14 +3,19 @@
 Configure a complete, beautiful zsh environment in one command.
 
 [![Tests](https://github.com/christopherlouet/pimpmyshell/actions/workflows/test.yml/badge.svg)](https://github.com/christopherlouet/pimpmyshell/actions/workflows/test.yml)
+[![Multi-Distro Tests](https://github.com/christopherlouet/pimpmyshell/actions/workflows/test-multi-distro.yml/badge.svg)](https://github.com/christopherlouet/pimpmyshell/actions/workflows/test-multi-distro.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Bash 4+](https://img.shields.io/badge/bash-4%2B-green.svg)](https://www.gnu.org/software/bash/)
 
 ## Features
 
 - **One-command setup** - `pimpmyshell apply` configures everything
-- **7 Themes** - Cyberpunk (default), Matrix, Dracula, Catppuccin, Nord, Gruvbox, Tokyo Night
-- **Coherent styling** - Each theme applies across Starship prompt, eza colors, and GNOME Terminal
-- **Live theme switching** - Terminal foreground, background, and 16-color palette change instantly via OSC escape sequences
-- **Modern CLI tools** - Automatic installation of eza, bat, fzf, starship, fd, ripgrep, zoxide, delta
+- **7 themes** - Cyberpunk (default), Matrix, Dracula, Catppuccin, Nord, Gruvbox, Tokyo Night
+- **Multi-terminal support** - GNOME Terminal, kitty, alacritty, Konsole, XFCE Terminal, WezTerm
+- **Multi-distro** - Debian/Ubuntu, Fedora/RHEL, Arch, openSUSE, Alpine, macOS
+- **Live theme switching** - Terminal colors change instantly via OSC escape sequences
+- **Modern CLI tools** - Automatic installation of eza, bat, fzf, starship, fd, ripgrep, zoxide, delta, dust, hyperfine, tldr
+- **Data-driven tool management** - YAML registry maps tools to packages per distribution
 - **Oh-My-Zsh integration** - Standard and custom plugins managed from YAML config
 - **Alias groups** - Git, Docker, Kubernetes, navigation, files
 - **Integrations** - fzf (preview with bat/eza), mise, tmux, zoxide, delta
@@ -18,8 +23,36 @@ Configure a complete, beautiful zsh environment in one command.
 - **Profiles** - Switch between work, personal, minimal configurations
 - **Interactive wizard** - Guided setup with `pimpmyshell wizard`
 - **Backup/restore** - Automatic backup before every change
-- **Cross-platform** - Linux (apt/dnf/pacman) and macOS (brew)
 - **Idempotent** - Safe to run multiple times
+
+## Supported platforms
+
+### Linux distributions
+
+| Family | Distributions | Package manager |
+|--------|--------------|-----------------|
+| Debian | Ubuntu, Debian, Mint | apt |
+| Fedora | Fedora, RHEL, CentOS, Rocky, Alma | dnf |
+| Arch | Arch, Manjaro, EndeavourOS | pacman |
+| SUSE | openSUSE Tumbleweed/Leap | zypper |
+| Alpine | Alpine Linux | apk |
+
+### macOS
+
+Supported via Homebrew.
+
+### Terminal emulators
+
+| Terminal | Theme support | Detection method |
+|----------|--------------|------------------|
+| GNOME Terminal | dconf profile + palette | dconf |
+| kitty | Config file + remote control | `TERM` / `TERM_PROGRAM` |
+| alacritty | TOML config file | `TERM` / `TERM_PROGRAM` |
+| Konsole | .colorscheme file | `KONSOLE_VERSION` |
+| XFCE Terminal | xfconf-query | `XFCE_TERMINAL_VERSION` |
+| WezTerm | OSC escape codes | `TERM_PROGRAM` |
+
+All terminals also receive OSC escape codes for immediate color changes.
 
 ## Installation
 
@@ -40,7 +73,7 @@ cd ~/.pimpmyshell
 ### Uninstall
 
 ```bash
-~/.pimpmyshell/install.sh --uninstall
+~/.pimpmyshell/install.sh uninstall
 ```
 
 ## Usage
@@ -164,7 +197,7 @@ See `pimpmyshell.yaml.example` for a fully documented configuration file.
 
 ## Themes
 
-Seven built-in themes, each applied consistently across Starship prompt, eza file listing colors, and optionally GNOME Terminal:
+Seven built-in themes, each applied consistently across Starship prompt, eza file listing colors, and your terminal emulator:
 
 | Theme | Description |
 |-------|-------------|
@@ -188,6 +221,24 @@ Switch theme (terminal colors change instantly):
 pimpmyshell theme matrix
 ```
 
+## Tools
+
+Tools are managed via a data-driven YAML registry (`config/tools-registry.yaml`). Each tool maps to the correct package name per distribution and has an alternative install method as fallback.
+
+| Tool | Description | Alt install |
+|------|-------------|-------------|
+| eza | Modern ls replacement | cargo |
+| bat | Cat with syntax highlighting | cargo |
+| fzf | Fuzzy finder | git clone |
+| starship | Cross-shell prompt | curl script |
+| fd | Fast find alternative | cargo |
+| ripgrep | Fast grep alternative | cargo |
+| zoxide | Smarter cd | cargo |
+| delta | Git diff viewer | cargo |
+| dust | Disk usage viewer | cargo |
+| hyperfine | Benchmarking tool | cargo |
+| tldr | Simplified man pages | npm |
+
 ## Shell completions
 
 Tab completion is available for bash and zsh. It covers all commands, subcommands, theme names, profile names, and options.
@@ -205,6 +256,51 @@ pimpmyshell doctor
 ```
 
 Checks: zsh, oh-my-zsh, required tools, plugins, theme files, Nerd Font, true color support.
+
+## Project structure
+
+```
+pimpmyshell/
+├── bin/              # CLI entry point
+├── completions/      # Bash and zsh completions
+├── config/           # tools-registry.yaml
+├── lib/              # Core library (13 modules)
+│   ├── core.sh       # Logging, guards, utilities
+│   ├── config.sh     # YAML config management
+│   ├── distro.sh     # Distribution detection
+│   ├── tools.sh      # Tool installation
+│   ├── themes.sh     # Theme engine (multi-terminal)
+│   ├── zshrc-gen.sh  # .zshrc generation
+│   ├── plugins.sh    # Plugin management
+│   ├── profiles.sh   # Profile switching
+│   ├── backup.sh     # Backup/restore
+│   ├── doctor.sh     # Diagnostics
+│   ├── wizard.sh     # Interactive wizard
+│   ├── validation.sh # Input validation
+│   └── yq-utils.sh   # YAML utilities
+├── modules/          # Alias modules (git, docker, k8s, nav, files)
+├── templates/        # zshrc template
+├── themes/           # 7 theme definitions + data files
+├── tests/            # 711 bats tests (18 test files)
+└── install.sh        # Installer (standalone)
+```
+
+## Testing
+
+Tests use [bats-core](https://github.com/bats-core/bats-core) (Bash Automated Testing System).
+
+```bash
+# Run all tests
+bats tests/
+
+# Run a specific test file
+bats tests/tools.bats
+```
+
+CI runs tests on:
+- Ubuntu (latest) and macOS (latest) via the **Tests** workflow
+- Fedora, Arch Linux, openSUSE Tumbleweed, Alpine via the **Multi-Distro Tests** workflow
+- ShellCheck static analysis on all shell files
 
 ## Requirements
 
