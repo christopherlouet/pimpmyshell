@@ -12,8 +12,14 @@
 # --- Plugins ---
 {PLUGINS}
 
+# --- Completions ---
+{COMPLETIONS}
+
 # --- Source Oh-My-Zsh ---
 source $ZSH/oh-my-zsh.sh
+
+# --- Theme (terminal colors) ---
+{TERMINAL_COLORS}
 
 # --- Theme (eza colors) ---
 {EZA_THEME}
@@ -23,6 +29,9 @@ source $ZSH/oh-my-zsh.sh
 
 # --- Integrations ---
 {INTEGRATIONS}
+
+# --- Shell wrapper (auto-reload on theme switch) ---
+{SHELL_WRAPPER}
 
 # --- Prompt (Starship) ---
 {PROMPT_INIT}

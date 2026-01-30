@@ -124,6 +124,41 @@ get_config() {
     fi
 }
 
+## Set a value in the YAML config file using yq
+## Usage: set_config <path> <value>
+## Example: set_config '.theme' 'dracula'
+set_config() {
+    local path="$1"
+    local value="$2"
+    local config_file="${PIMPMYSHELL_CONFIG_FILE:-$DEFAULT_CONFIG_FILE}"
+
+    if [[ ! -f "$config_file" ]]; then
+        log_error "Config file not found: $config_file"
+        return 1
+    fi
+
+    require_yq || return 1
+
+    local yq_type
+    yq_type=$(detect_yq_version)
+
+    case "$yq_type" in
+        go)
+            yq eval "${path} = \"${value}\"" -i "$config_file" 2>/dev/null
+            ;;
+        python)
+            yq -y --in-place "${path} = \"${value}\"" "$config_file" 2>/dev/null
+            ;;
+        *)
+            log_error "yq is required to update config"
+            return 1
+            ;;
+    esac
+
+    log_verbose "Config updated: ${path} = ${value}"
+    return 0
+}
+
 ## Check if a config path is enabled (true/yes/1)
 ## Usage: config_enabled <path>
 config_enabled() {
@@ -226,8 +261,24 @@ _generate_plugins_line() {
     local custom_plugins
     custom_plugins=$(get_config_list '.plugins.custom')
     if [[ -n "$custom_plugins" ]]; then
+        # Check if fzf-tab is explicitly disabled
+        local fzf_tab_enabled=true
+        if ! config_enabled '.integrations.fzf_tab.enabled'; then
+            # Only skip if the key exists and is explicitly false
+            local fzf_tab_value
+            fzf_tab_value=$(get_config '.integrations.fzf_tab.enabled' "")
+            if [[ -n "$fzf_tab_value" ]]; then
+                fzf_tab_enabled=false
+            fi
+        fi
+
         while IFS= read -r plugin; do
             [[ -z "$plugin" ]] && continue
+            # Skip fzf-tab if disabled in config
+            if [[ "$plugin" == "fzf-tab" && "$fzf_tab_enabled" == false ]]; then
+                log_verbose "Skipping fzf-tab plugin (disabled in integrations.fzf_tab.enabled)"
+                continue
+            fi
             if [[ -n "$all_plugins" ]]; then
                 all_plugins="${all_plugins} ${plugin}"
             else
@@ -299,7 +350,43 @@ _generate_eza_theme() {
     echo "[[ -f \"${eza_theme_file}\" ]] && source \"${eza_theme_file}\""
 }
 
+## Generate terminal colors source line
+## Usage: _generate_terminal_colors
+_generate_terminal_colors() {
+    local colors_file="${PIMPMYSHELL_DATA_DIR}/colors/terminal-colors.sh"
+    echo "[[ -f \"${colors_file}\" ]] && source \"${colors_file}\""
+}
+
+## Generate completions fpath setup
+## Usage: _generate_completions
+_generate_completions() {
+    local completions_dir="${PIMPMYSHELL_ROOT}/completions"
+    if [[ -d "$completions_dir" ]]; then
+        echo "fpath=(${completions_dir} \$fpath)"
+    fi
+}
+
 ## Generate prompt initialization
+## Generate shell wrapper function that auto-reloads eza/starship on theme switch
+## Usage: _generate_shell_wrapper
+_generate_shell_wrapper() {
+    local eza_theme_file="${PIMPMYSHELL_DATA_DIR}/eza/eza-theme.sh"
+    local colors_file="${PIMPMYSHELL_DATA_DIR}/colors/terminal-colors.sh"
+    cat <<'WRAPPER'
+pimpmyshell() {
+    command pimpmyshell "$@"
+    local ret=$?
+    if [[ $ret -eq 0 && "$1" == "theme" && -n "${2:-}" && "$2" != --* ]]; then
+WRAPPER
+    echo "        [[ -f \"${eza_theme_file}\" ]] && source \"${eza_theme_file}\""
+    echo "        [[ -f \"${colors_file}\" ]] && source \"${colors_file}\""
+    cat <<'WRAPPER'
+    fi
+    return $ret
+}
+WRAPPER
+}
+
 ## Usage: _generate_prompt_init
 _generate_prompt_init() {
     local prompt_engine
@@ -394,13 +481,17 @@ generate_zshrc() {
     theme_name=$(get_config '.theme' "$DEFAULT_THEME")
 
     # Generate all sections
-    local env_vars omz_config plugins_line aliases integrations eza_theme prompt_init
+    local env_vars omz_config plugins_line completions aliases integrations eza_theme terminal_colors prompt_init
     env_vars=$(_generate_env_vars)
     omz_config=$(_generate_omz_config)
     plugins_line=$(_generate_plugins_line)
+    completions=$(_generate_completions)
     aliases=$(_generate_aliases)
     integrations=$(_generate_integrations)
+    terminal_colors=$(_generate_terminal_colors)
     eza_theme=$(_generate_eza_theme)
+    local shell_wrapper
+    shell_wrapper=$(_generate_shell_wrapper)
     prompt_init=$(_generate_prompt_init)
 
     # Read template and replace placeholders using awk (safe with special chars)
@@ -412,9 +503,12 @@ generate_zshrc() {
     content=$(echo "$content" | _replace_placeholder "ENV_VARS" "$env_vars")
     content=$(echo "$content" | _replace_placeholder "OMZ_CONFIG" "$omz_config")
     content=$(echo "$content" | _replace_placeholder "PLUGINS" "$plugins_line")
+    content=$(echo "$content" | _replace_placeholder "COMPLETIONS" "$completions")
     content=$(echo "$content" | _replace_placeholder "ALIASES" "$aliases")
     content=$(echo "$content" | _replace_placeholder "INTEGRATIONS" "$integrations")
+    content=$(echo "$content" | _replace_placeholder "TERMINAL_COLORS" "$terminal_colors")
     content=$(echo "$content" | _replace_placeholder "EZA_THEME" "$eza_theme")
+    content=$(echo "$content" | _replace_placeholder "SHELL_WRAPPER" "$shell_wrapper")
     content=$(echo "$content" | _replace_placeholder "PROMPT_INIT" "$prompt_init")
     content=$(echo "$content" | _replace_placeholder "USER_CUSTOM" "$user_custom")
 

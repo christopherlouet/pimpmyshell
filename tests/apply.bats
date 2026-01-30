@@ -55,6 +55,7 @@ setup() {
     assert_file_contains "$template" "{ENV_VARS}"
     assert_file_contains "$template" "{OMZ_CONFIG}"
     assert_file_contains "$template" "{PLUGINS}"
+    assert_file_contains "$template" "{COMPLETIONS}"
     assert_file_contains "$template" "{EZA_THEME}"
     assert_file_contains "$template" "{ALIASES}"
     assert_file_contains "$template" "{INTEGRATIONS}"
