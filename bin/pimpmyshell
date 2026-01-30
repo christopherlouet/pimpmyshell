@@ -233,6 +233,11 @@ cmd_theme() {
             fi
             apply_theme "$theme_name"
             log_success "Theme switched to: $theme_name"
+            # Reload zsh to apply new theme configuration
+            if check_command zsh; then
+                log_info "Reloading shell..."
+                exec zsh
+            fi
             ;;
     esac
 }
