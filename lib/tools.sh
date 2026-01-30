@@ -48,6 +48,7 @@ detect_pkg_manager() {
 ## Some tools have different command names on different systems
 ## Usage: get_tool_command <tool_name>
 get_tool_command() {
+    _require_args "get_tool_command" 1 $# || return 1
     local tool_name="$1"
     case "$tool_name" in
         bat)
@@ -89,6 +90,7 @@ get_tool_command() {
 ## Check if a tool is installed (using resolved command name)
 ## Usage: is_tool_installed <tool_name>
 is_tool_installed() {
+    _require_args "is_tool_installed" 1 $# || return 1
     local tool_name="$1"
     local cmd
     cmd=$(get_tool_command "$tool_name")
@@ -98,6 +100,7 @@ is_tool_installed() {
 ## Get the package name for a tool on a given package manager
 ## Usage: get_tool_pkg_name <tool_name> <pkg_manager>
 get_tool_pkg_name() {
+    _require_args "get_tool_pkg_name" 2 $# || return 1
     local tool_name="$1"
     local pkg_manager="$2"
 
@@ -177,6 +180,7 @@ _install_tool_alternative() {
 ## Install a single tool using the system package manager
 ## Usage: install_tool <tool_name> [pkg_manager]
 install_tool() {
+    _require_args "install_tool" 1 $# || return 1
     local tool_name="$1"
     local pkg_manager="${2:-}"
 
@@ -276,6 +280,7 @@ install_all_tools() {
 ## Usage: get_all_tools <category>
 ## Categories: "required" or "recommended"
 get_all_tools() {
+    _require_args "get_all_tools" 1 $# || return 1
     local category="$1"
     get_config_list ".tools.${category}"
 }

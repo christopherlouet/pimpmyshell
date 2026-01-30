@@ -378,3 +378,37 @@ setup() {
         [[ -f "${PIMPMYSHELL_THEMES_DIR}/${theme}.yaml" ]]
     done
 }
+
+# =============================================================================
+# Argument validation
+# =============================================================================
+
+@test "get_theme_path fails without arguments" {
+    run get_theme_path
+    assert_failure
+    assert_output_contains "get_theme_path"
+}
+
+@test "theme_get fails without arguments" {
+    run theme_get
+    assert_failure
+    assert_output_contains "theme_get"
+}
+
+@test "load_theme fails without arguments" {
+    run load_theme
+    assert_failure
+    assert_output_contains "load_theme"
+}
+
+@test "apply_theme fails without arguments" {
+    run apply_theme
+    assert_failure
+    assert_output_contains "apply_theme"
+}
+
+@test "preview_theme fails without arguments" {
+    run preview_theme
+    assert_failure
+    assert_output_contains "preview_theme"
+}

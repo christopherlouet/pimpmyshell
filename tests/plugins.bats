@@ -336,3 +336,25 @@ setup() {
     run is_plugin_installed "git"
     assert_failure
 }
+
+# =============================================================================
+# Argument validation
+# =============================================================================
+
+@test "get_plugin_url fails without arguments" {
+    run get_plugin_url
+    assert_failure
+    assert_output_contains "get_plugin_url"
+}
+
+@test "clone_custom_plugin fails without arguments" {
+    run clone_custom_plugin
+    assert_failure
+    assert_output_contains "clone_custom_plugin"
+}
+
+@test "get_configured_plugins fails without arguments" {
+    run get_configured_plugins
+    assert_failure
+    assert_output_contains "get_configured_plugins"
+}

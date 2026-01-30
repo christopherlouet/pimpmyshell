@@ -20,6 +20,11 @@ if [[ -z "${_PIMPMYSHELL_CONFIG_LOADED:-}" ]]; then
     source "${PIMPMYSHELL_LIB_DIR:-$(dirname "${BASH_SOURCE[0]}")}/config.sh"
 fi
 
+if [[ -z "${_PIMPMYSHELL_ZSHRC_GEN_LOADED:-}" ]]; then
+    # shellcheck source=./zshrc-gen.sh
+    source "${PIMPMYSHELL_LIB_DIR:-$(dirname "${BASH_SOURCE[0]}")}/zshrc-gen.sh"
+fi
+
 if [[ -z "${_PIMPMYSHELL_THEMES_LOADED:-}" ]]; then
     # shellcheck source=./themes.sh
     source "${PIMPMYSHELL_LIB_DIR:-$(dirname "${BASH_SOURCE[0]}")}/themes.sh"

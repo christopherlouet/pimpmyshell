@@ -52,6 +52,7 @@ list_themes() {
 ## Get theme file path
 ## Usage: get_theme_path <theme_name>
 get_theme_path() {
+    _require_args "get_theme_path" 1 $# || return 1
     local theme_name="$1"
     local theme_file="${PIMPMYSHELL_THEMES_DIR}/${theme_name}.yaml"
 
@@ -72,6 +73,7 @@ get_theme_path() {
 ## Get a value from theme YAML
 ## Usage: theme_get <theme_file> <path> [default]
 theme_get() {
+    _require_args "theme_get" 2 $# || return 1
     local theme_file="$1"
     local path="$2"
     local default="${3:-}"
@@ -95,6 +97,7 @@ theme_get() {
 ## Usage: theme_get_palette <theme_file>
 ## Returns: "['#hex0', '#hex1', ..., '#hex15']" or empty string
 theme_get_palette() {
+    _require_args "theme_get_palette" 1 $# || return 1
     local theme_file="$1"
 
     if [[ ! -f "$theme_file" ]]; then
@@ -134,6 +137,7 @@ theme_get_palette() {
 ## Usage: load_theme <theme_name>
 ## Sets: THEME_* variables
 load_theme() {
+    _require_args "load_theme" 1 $# || return 1
     local theme_name="$1"
     local theme_file
 
@@ -356,6 +360,7 @@ COLORS
 ## Apply Starship prompt theme
 ## Usage: apply_starship_theme <theme_name>
 apply_starship_theme() {
+    _require_args "apply_starship_theme" 1 $# || return 1
     local theme_name="$1"
     local data_dir="${PIMPMYSHELL_THEMES_DIR}/data"
     local source_toml="${data_dir}/${theme_name}.toml"
@@ -383,6 +388,7 @@ apply_starship_theme() {
 ## Apply eza color theme
 ## Usage: apply_eza_theme <theme_name>
 apply_eza_theme() {
+    _require_args "apply_eza_theme" 1 $# || return 1
     local theme_name="$1"
     local data_dir="${PIMPMYSHELL_THEMES_DIR}/data"
     local source_sh="${data_dir}/eza-${theme_name}.sh"
@@ -406,6 +412,7 @@ apply_eza_theme() {
 ## Apply theme to all components (orchestration)
 ## Usage: apply_theme <theme_name>
 apply_theme() {
+    _require_args "apply_theme" 1 $# || return 1
     local theme_name="$1"
 
     # Verify theme exists
@@ -438,6 +445,7 @@ apply_theme() {
 ## Preview theme colors in terminal
 ## Usage: preview_theme <theme_name>
 preview_theme() {
+    _require_args "preview_theme" 1 $# || return 1
     local theme_name="$1"
 
     load_theme "$theme_name" || return 1

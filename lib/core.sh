@@ -137,6 +137,21 @@ log_error_box() {
     return 0
 }
 
+## Validate minimum number of arguments for a function
+## Usage: _require_args <func_name> <min_args> <actual_args>
+## Returns: 0 if OK, 1 with log_error if insufficient
+_require_args() {
+    local func_name="$1"
+    local min_args="$2"
+    local actual_args="$3"
+
+    if [[ "$actual_args" -lt "$min_args" ]]; then
+        log_error "${func_name}: expected at least ${min_args} argument(s), got ${actual_args}"
+        return 1
+    fi
+    return 0
+}
+
 ## Log a warning with suggested action
 warn_with_action() {
     local warning="$1"

@@ -361,3 +361,37 @@ setup() {
     run cmd_profile delete "testprofile"
     assert_success
 }
+
+# =============================================================================
+# Argument validation
+# =============================================================================
+
+@test "profile_exists fails without arguments" {
+    run profile_exists
+    assert_failure
+    assert_output_contains "profile_exists"
+}
+
+@test "create_profile fails without arguments" {
+    run create_profile
+    assert_failure
+    assert_output_contains "create_profile"
+}
+
+@test "switch_profile fails without arguments" {
+    run switch_profile
+    assert_failure
+    assert_output_contains "switch_profile"
+}
+
+@test "delete_profile fails without arguments" {
+    run delete_profile
+    assert_failure
+    assert_output_contains "delete_profile"
+}
+
+@test "get_profile_config_path fails without arguments" {
+    run get_profile_config_path
+    assert_failure
+    assert_output_contains "get_profile_config_path"
+}

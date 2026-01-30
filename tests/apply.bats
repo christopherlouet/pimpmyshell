@@ -23,6 +23,7 @@ setup() {
     # Load libs
     load_lib 'core'
     load_lib 'config'
+    load_lib 'zshrc-gen'
     load_lib 'themes'
     load_lib 'plugins'
 
