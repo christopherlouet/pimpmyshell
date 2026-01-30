@@ -452,15 +452,16 @@ _replace_placeholder() {
     local replacement="$2"
     local content
     content=$(cat)
-    # Use awk for safe replacement (no special char issues)
-    echo "$content" | awk -v pat="{${placeholder}}" -v rep="$replacement" '{
+    # Use awk for safe replacement (handles multi-line values on all platforms)
+    # Pass replacement via environment variable to avoid BSD awk -v newline issues
+    _AWK_REP="$replacement" awk -v pat="{${placeholder}}" '{
         idx = index($0, pat)
         while (idx > 0) {
-            $0 = substr($0, 1, idx-1) rep substr($0, idx+length(pat))
+            $0 = substr($0, 1, idx-1) ENVIRON["_AWK_REP"] substr($0, idx+length(pat))
             idx = index($0, pat)
         }
         print
-    }'
+    }' <<< "$content"
 }
 
 ## Generate complete .zshrc from template and config
