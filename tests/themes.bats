@@ -412,3 +412,50 @@ setup() {
     assert_failure
     assert_output_contains "preview_theme"
 }
+
+# =============================================================================
+# theme_get_palette edge cases
+# =============================================================================
+
+@test "theme_get_palette returns formatted string for cyberpunk theme" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    local theme_file="${PIMPMYSHELL_THEMES_DIR}/cyberpunk.yaml"
+    run theme_get_palette "$theme_file"
+    assert_success
+    # Should return a bracket-delimited list
+    [[ "$output" == "["*"]" ]]
+}
+
+@test "theme_get_palette returns empty for missing palette" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    local yaml_file="${PIMPMYSHELL_TEST_DIR}/no-palette.yaml"
+    echo "name: test" > "$yaml_file"
+    run theme_get_palette "$yaml_file"
+    assert_success
+    [[ -z "$output" ]]
+}
+
+@test "theme_get_palette returns empty for non-existent file" {
+    run theme_get_palette "/nonexistent/theme.yaml"
+    assert_success
+    [[ -z "$output" ]]
+}
+
+@test "theme_get_palette expands hex to dconf format" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    local theme_file="${PIMPMYSHELL_THEMES_DIR}/cyberpunk.yaml"
+    local result
+    result=$(theme_get_palette "$theme_file")
+    # dconf format uses #RRRRGGGGBBBB (6-char hex doubled)
+    [[ "$result" == *"#"* ]]
+    # Each color should be 13 chars (#RRRRGGGGBBBB)
+    local first_color
+    first_color=$(echo "$result" | tr -d "[]' " | cut -d',' -f1)
+    [[ ${#first_color} -eq 13 ]]
+}

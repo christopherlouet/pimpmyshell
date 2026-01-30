@@ -359,3 +359,92 @@ setup() {
     assert_failure
     assert_output_contains "get_all_tools"
 }
+
+# =============================================================================
+# Tools Registry (data-driven)
+# =============================================================================
+
+@test "_tools_registry_get reads a value from the registry" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run _tools_registry_get ".tools.bat.alt_install"
+    assert_success
+    assert_output_equals "cargo install bat"
+}
+
+@test "_tools_registry_get returns empty for missing key" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run _tools_registry_get ".tools.nonexistent.command"
+    assert_success
+    [[ -z "$output" ]]
+}
+
+@test "_tools_registry_get returns empty when registry missing" {
+    PIMPMYSHELL_TOOLS_REGISTRY="/nonexistent/registry.yaml" \
+        run _tools_registry_get ".tools.bat.command"
+    assert_success
+    [[ -z "$output" ]]
+}
+
+@test "get_tool_command resolves ripgrep to rg from registry" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_command "ripgrep"
+    assert_success
+    assert_output_equals "rg"
+}
+
+@test "get_tool_command resolves delta from registry" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_command "delta"
+    assert_success
+    assert_output_equals "delta"
+}
+
+@test "get_tool_command falls back to tool name for unknown tool" {
+    run get_tool_command "sometool"
+    assert_success
+    assert_output_equals "sometool"
+}
+
+@test "get_tool_pkg_name reads from registry for fd:apt" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_pkg_name "fd" "apt"
+    assert_success
+    assert_output_equals "fd-find"
+}
+
+@test "get_tool_pkg_name reads from registry for delta:brew" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_pkg_name "delta" "brew"
+    assert_success
+    assert_output_equals "git-delta"
+}
+
+@test "get_tool_alt_install reads from registry for dust" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_alt_install "dust"
+    assert_success
+    assert_output_equals "cargo install du-dust"
+}
+
+@test "get_tool_alt_install reads from registry for fzf" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    run get_tool_alt_install "fzf"
+    assert_success
+    assert_output_contains "fzf"
+}
