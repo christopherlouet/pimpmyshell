@@ -101,3 +101,4 @@ _pimpmyshell_completions() {
 
 # Register the completion function
 complete -F _pimpmyshell_completions pimpmyshell
+complete -F _pimpmyshell_completions pms

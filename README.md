@@ -84,7 +84,19 @@ cd ~/.pimpmyshell
 pimpmyshell wizard
 ```
 
-The wizard guides you through choosing a theme, plugins, aliases, and integrations, then generates your configuration file.
+The wizard guides you through 7 steps:
+
+| Step | Description |
+|------|-------------|
+| 1. Theme | Choose from 7 themes with color swatch preview |
+| 2. Plugins | Select Oh-My-Zsh and custom plugins |
+| 3. Aliases | Pick alias groups (git, docker, kubernetes, navigation, files) |
+| 4. Integrations | Enable fzf, zoxide, delta, fzf_tab, mise, tmux |
+| 5. Tools | Select recommended CLI tools to install |
+| 6. Preview | Review configuration summary before applying |
+| 7. Profile | Optionally save as a named profile |
+
+After confirmation, the wizard generates `pimpmyshell.yaml`, applies the theme, installs plugins, generates `.zshrc`, and reloads the shell.
 
 ### Apply configuration
 
@@ -126,6 +138,23 @@ Reads `~/.config/pimpmyshell/pimpmyshell.yaml` and generates your `.zshrc`, appl
 --dry-run           Show what would be done without making changes
 --no-backup         Skip automatic backup before apply
 ```
+
+### Aliases
+
+Shorthand aliases are available after installation:
+
+| Alias | Equivalent | Description |
+|-------|-----------|-------------|
+| `pms` | `pimpmyshell` | Short alias for all commands |
+| `pms-switch <name>` | `pimpmyshell profile switch <name>` | Quick profile switch |
+
+```bash
+pms wizard              # Interactive setup
+pms theme matrix        # Switch theme
+pms-switch work         # Switch to work profile
+```
+
+`pms` and `pms-switch` are available as symlinks immediately after `install.sh`. Tab completion works for both.
 
 ## Configuration
 

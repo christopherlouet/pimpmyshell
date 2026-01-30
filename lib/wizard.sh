@@ -42,10 +42,11 @@ fi
 WIZARD_THEME="${WIZARD_THEME:-cyberpunk}"
 WIZARD_FRAMEWORK="${WIZARD_FRAMEWORK:-ohmyzsh}"
 WIZARD_PROMPT_ENGINE="${WIZARD_PROMPT_ENGINE:-starship}"
-WIZARD_OMZ_PLUGINS="${WIZARD_OMZ_PLUGINS:-git fzf}"
+WIZARD_OMZ_PLUGINS="${WIZARD_OMZ_PLUGINS:-git fzf docker kubectl extract wd eza}"
 WIZARD_CUSTOM_PLUGINS="${WIZARD_CUSTOM_PLUGINS:-zsh-autosuggestions zsh-syntax-highlighting}"
 WIZARD_ALIAS_GROUPS="${WIZARD_ALIAS_GROUPS:-git docker navigation files}"
 WIZARD_ALIASES_ENABLED="${WIZARD_ALIASES_ENABLED:-true}"
+WIZARD_INTEGRATIONS="${WIZARD_INTEGRATIONS:-fzf zoxide delta}"
 WIZARD_TOOLS="${WIZARD_TOOLS:-}"
 WIZARD_PROFILE="${WIZARD_PROFILE:-}"
 
@@ -535,6 +536,7 @@ _wizard_step_theme() {
 }
 
 ## Step: Choose plugins (with descriptions)
+## Default: all enabled except tmux, web-search, mise (listed last)
 _wizard_step_plugins() {
     local step_num="${1:-2}"
     local total="${2:-${#_WIZARD_STEPS[@]}}"
@@ -542,15 +544,101 @@ _wizard_step_plugins() {
     _wizard_progress_bar "$step_num" "$total" "Choose plugins"
     echo ""
 
-    # Standard plugins with descriptions
-    local omz_names=("git" "fzf" "tmux" "docker" "kubectl" "extract" "web-search" "wd" "mise" "eza")
+    # Standard plugins: enabled-by-default first, disabled-by-default last
+    local omz_names=("git" "fzf" "docker" "kubectl" "extract" "wd" "eza" "tmux" "web-search" "mise")
     local omz_options=()
     for name in "${omz_names[@]}"; do
         omz_options+=("$(_wizard_with_desc "plugin" "$name")")
     done
 
+    # Default pre-selected OMZ plugins
+    local defaults="${WIZARD_OMZ_PLUGINS:-git}"
+
     local selected_omz
-    selected_omz=$(_wizard_choose_multi "Select Oh-My-Zsh plugins:" "${omz_options[@]}")
+    if [[ -n "${WIZARD_AUTO:-}" ]]; then
+        # Auto mode: return only default plugins
+        selected_omz=""
+        for name in "${omz_names[@]}"; do
+            if [[ " $defaults " == *" $name "* ]]; then
+                selected_omz+="$(_wizard_with_desc "plugin" "$name")"$'\n'
+            fi
+        done
+    elif _use_gum; then
+        # Build --selected from defaults (not all)
+        local selected_csv=""
+        for name in "${omz_names[@]}"; do
+            if [[ " $defaults " == *" $name "* ]]; then
+                local label
+                label=$(_wizard_with_desc "plugin" "$name")
+                selected_csv="${selected_csv:+$selected_csv,}$label"
+            fi
+        done
+        selected_omz=$(gum choose --no-limit --selected="$selected_csv" --header "Select Oh-My-Zsh plugins:" "${omz_options[@]}")
+    else
+        echo "Select Oh-My-Zsh plugins:"
+        echo "(Enter numbers separated by spaces, 'all', or Enter for defaults: $defaults)"
+        local i=1
+        for opt in "${omz_options[@]}"; do
+            echo "  $i) $opt"
+            ((i++))
+        done
+        echo ""
+
+        local attempt
+        for attempt in 1 2 3; do
+            local choices
+            read -rp "Enter choices: " choices
+
+            if [[ "$choices" == "all" ]]; then
+                selected_omz=$(printf '%s\n' "${omz_options[@]}")
+                break
+            fi
+
+            if [[ -z "$choices" ]]; then
+                # Return defaults only
+                selected_omz=""
+                for name in "${omz_names[@]}"; do
+                    if [[ " $defaults " == *" $name "* ]]; then
+                        selected_omz+="$(_wizard_with_desc "plugin" "$name")"$'\n'
+                    fi
+                done
+                break
+            fi
+
+            local valid_count=0
+            local invalid_found=0
+            local valid_selections=()
+            for num in $choices; do
+                if [[ "$num" =~ ^[0-9]+$ && "$num" -ge 1 && "$num" -le ${#omz_options[@]} ]] 2>/dev/null; then
+                    valid_selections+=("${omz_options[$((num - 1))]}")
+                    ((valid_count++))
+                else
+                    ((invalid_found++))
+                fi
+            done
+
+            if [[ "$valid_count" -gt 0 ]]; then
+                if [[ "$invalid_found" -gt 0 ]]; then
+                    echo "Warning: some invalid entries were skipped." >&2
+                fi
+                selected_omz=$(printf '%s\n' "${valid_selections[@]}")
+                break
+            fi
+
+            if [[ "$attempt" -lt 3 ]]; then
+                echo "No valid selections. Enter numbers between 1 and ${#omz_options[@]}."
+            fi
+        done
+        # After 3 failed attempts, return defaults
+        if [[ -z "${selected_omz:-}" ]]; then
+            selected_omz=""
+            for name in "${omz_names[@]}"; do
+                if [[ " $defaults " == *" $name "* ]]; then
+                    selected_omz+="$(_wizard_with_desc "plugin" "$name")"$'\n'
+                fi
+            done
+        fi
+    fi
 
     WIZARD_OMZ_PLUGINS=""
     while IFS= read -r line; do
@@ -626,6 +714,7 @@ _wizard_step_aliases() {
 }
 
 ## Step: Choose integrations (with descriptions, includes fzf_tab)
+## Default: only fzf is pre-selected
 _wizard_step_integrations() {
     local step_num="${1:-4}"
     local total="${2:-${#_WIZARD_STEPS[@]}}"
@@ -633,14 +722,101 @@ _wizard_step_integrations() {
     _wizard_progress_bar "$step_num" "$total" "Choose integrations"
     echo ""
 
-    local integ_names=("fzf" "fzf_tab" "mise" "tmux" "zoxide" "delta")
+    # Enabled-by-default first, disabled-by-default last
+    local integ_names=("fzf" "zoxide" "delta" "fzf_tab" "mise" "tmux")
     local integ_options=()
     for name in "${integ_names[@]}"; do
         integ_options+=("$(_wizard_with_desc "integ" "$name")")
     done
 
+    # Default pre-selected integrations
+    local defaults="${WIZARD_INTEGRATIONS:-fzf}"
+
     local selected
-    selected=$(_wizard_choose_multi "Select integrations:" "${integ_options[@]}")
+    if [[ -n "${WIZARD_AUTO:-}" ]]; then
+        # Auto mode: return only default integrations
+        selected=""
+        for name in "${integ_names[@]}"; do
+            if [[ " $defaults " == *" $name "* ]]; then
+                selected+="$(_wizard_with_desc "integ" "$name")"$'\n'
+            fi
+        done
+    elif _use_gum; then
+        # Build --selected from defaults (not all)
+        local selected_csv=""
+        for name in "${integ_names[@]}"; do
+            if [[ " $defaults " == *" $name "* ]]; then
+                local label
+                label=$(_wizard_with_desc "integ" "$name")
+                selected_csv="${selected_csv:+$selected_csv,}$label"
+            fi
+        done
+        selected=$(gum choose --no-limit --selected="$selected_csv" --header "Select integrations:" "${integ_options[@]}")
+    else
+        echo "Select integrations:"
+        echo "(Enter numbers separated by spaces, 'all', or Enter for defaults: $defaults)"
+        local i=1
+        for opt in "${integ_options[@]}"; do
+            echo "  $i) $opt"
+            ((i++))
+        done
+        echo ""
+
+        local attempt
+        for attempt in 1 2 3; do
+            local choices
+            read -rp "Enter choices: " choices
+
+            if [[ "$choices" == "all" ]]; then
+                selected=$(printf '%s\n' "${integ_options[@]}")
+                break
+            fi
+
+            if [[ -z "$choices" ]]; then
+                # Return defaults only
+                selected=""
+                for name in "${integ_names[@]}"; do
+                    if [[ " $defaults " == *" $name "* ]]; then
+                        selected+="$(_wizard_with_desc "integ" "$name")"$'\n'
+                    fi
+                done
+                break
+            fi
+
+            local valid_count=0
+            local invalid_found=0
+            local valid_selections=()
+            for num in $choices; do
+                if [[ "$num" =~ ^[0-9]+$ && "$num" -ge 1 && "$num" -le ${#integ_options[@]} ]] 2>/dev/null; then
+                    valid_selections+=("${integ_options[$((num - 1))]}")
+                    ((valid_count++))
+                else
+                    ((invalid_found++))
+                fi
+            done
+
+            if [[ "$valid_count" -gt 0 ]]; then
+                if [[ "$invalid_found" -gt 0 ]]; then
+                    echo "Warning: some invalid entries were skipped." >&2
+                fi
+                selected=$(printf '%s\n' "${valid_selections[@]}")
+                break
+            fi
+
+            if [[ "$attempt" -lt 3 ]]; then
+                echo "No valid selections. Enter numbers between 1 and ${#integ_options[@]}."
+            fi
+        done
+        # After 3 failed attempts, return defaults
+        if [[ -z "${selected:-}" ]]; then
+            selected=""
+            for name in "${integ_names[@]}"; do
+                if [[ " $defaults " == *" $name "* ]]; then
+                    selected+="$(_wizard_with_desc "integ" "$name")"$'\n'
+                fi
+            done
+        fi
+    fi
 
     WIZARD_INTEGRATIONS=""
     while IFS= read -r line; do
@@ -877,7 +1053,7 @@ _wizard_generate_config() {
         local zoxide_enabled="false"
         local delta_enabled="false"
 
-        for integ in ${WIZARD_INTEGRATIONS:-fzf mise}; do
+        for integ in ${WIZARD_INTEGRATIONS:-fzf}; do
             case "$integ" in
                 fzf) fzf_enabled="true" ;;
                 fzf_tab) fzf_tab_enabled="true" ;;
@@ -1009,7 +1185,14 @@ run_wizard() {
         echo ""
         log_success "Configuration applied!"
         log_info "Theme: $theme_name"
-        log_info "Reload your shell: source ~/.zshrc"
+
+        # Reload zsh to apply new configuration
+        if check_command zsh; then
+            log_info "Reloading shell..."
+            exec zsh
+        else
+            log_info "Reload your shell: source ~/.zshrc"
+        fi
     else
         log_info "Apply later with: pimpmyshell apply"
     fi

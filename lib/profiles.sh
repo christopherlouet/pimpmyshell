@@ -151,7 +151,7 @@ create_profile() {
     return 0
 }
 
-## Switch to a different profile
+## Switch to a different profile and apply its theme
 ## Usage: switch_profile <name>
 switch_profile() {
     _require_args "switch_profile" 1 $# || return 1
@@ -168,7 +168,37 @@ switch_profile() {
     rm -f "$current_link"
     ln -s "$name" "$current_link"
 
+    # Apply theme from the new profile's config
+    local config_path
+    config_path=$(get_active_config_path)
+
+    if [[ -f "$config_path" ]]; then
+        local prev_config="${PIMPMYSHELL_CONFIG_FILE:-}"
+        export PIMPMYSHELL_CONFIG_FILE="$config_path"
+
+        if command -v apply_theme &>/dev/null; then
+            local theme_name
+            theme_name=$(get_config '.theme' "${DEFAULT_THEME}")
+            log_info "Applying theme: $theme_name"
+            apply_theme "$theme_name" || log_warn "Could not apply theme from profile"
+        fi
+
+        # Restore previous config env if it was set
+        if [[ -n "$prev_config" ]]; then
+            export PIMPMYSHELL_CONFIG_FILE="$prev_config"
+        else
+            unset PIMPMYSHELL_CONFIG_FILE
+        fi
+    fi
+
     log_success "Switched to profile: $name"
+
+    # Reload zsh to apply new profile configuration
+    if check_command zsh; then
+        log_info "Reloading shell..."
+        exec zsh
+    fi
+
     return 0
 }
 

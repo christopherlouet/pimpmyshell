@@ -706,13 +706,18 @@ setup() {
 }
 
 # =============================================================================
-# _wizard_step_integrations (auto mode with fzf_tab)
+# _wizard_step_integrations (auto mode defaults)
 # =============================================================================
 
-@test "_wizard_step_integrations includes fzf_tab option" {
+@test "_wizard_step_integrations defaults to fzf zoxide delta in auto mode" {
     export WIZARD_AUTO=1
     _wizard_step_integrations 4 7
-    [[ "$WIZARD_INTEGRATIONS" == *"fzf_tab"* ]]
+    [[ "$WIZARD_INTEGRATIONS" == *"fzf"* ]]
+    [[ "$WIZARD_INTEGRATIONS" == *"zoxide"* ]]
+    [[ "$WIZARD_INTEGRATIONS" == *"delta"* ]]
+    [[ "$WIZARD_INTEGRATIONS" != *"fzf_tab"* ]]
+    [[ "$WIZARD_INTEGRATIONS" != *"mise"* ]]
+    [[ "$WIZARD_INTEGRATIONS" != *"tmux"* ]]
 }
 
 # =============================================================================

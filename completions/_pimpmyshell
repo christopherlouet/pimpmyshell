@@ -131,3 +131,6 @@ _pimpmyshell() {
 }
 
 _pimpmyshell "$@"
+
+# Also register completion for the pms alias
+compdef pms=pimpmyshell 2>/dev/null

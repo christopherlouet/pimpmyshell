@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-01-30
+
+### Added
+
+- CLI aliases: `pms` (shorthand for `pimpmyshell`) and `pms-switch` (shorthand for `pimpmyshell profile switch`)
+- `pms-switch` invocation detection via `basename "$0"` in `bin/pimpmyshell`, routes to `profile switch`
+- Symlinks `pms` and `pms-switch` created by `install.sh`, removed on uninstall
+- Shell completions registered for `pms` alias (bash and zsh)
+- ALIASES section in CLI help (`pimpmyshell help`)
+- Profile switch now applies theme from the new profile's config (`apply_theme`)
+- Profile switch and wizard auto-reload shell via `exec zsh` after applying configuration
+- `WIZARD_INTEGRATIONS` state variable with configurable defaults
+- README: wizard steps table and aliases documentation
+
+### Changed
+
+- Wizard OMZ plugins default: all enabled except `tmux`, `web-search`, `mise` (previously all enabled)
+- Wizard OMZ plugins order: disabled plugins (`tmux`, `web-search`, `mise`) listed last
+- Wizard integrations default: `fzf`, `zoxide`, `delta` enabled (previously all enabled)
+- Wizard integrations order: disabled integrations (`fzf_tab`, `mise`, `tmux`) listed last
+- Wizard and integrations steps use default-aware selection instead of all-selected for gum, fallback, and auto modes
+- Config generation fallback updated from `fzf mise` to `fzf zoxide delta`
+
 ## [0.4.0] - 2026-01-30
 
 ### Added
@@ -141,7 +164,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD: GitHub Actions for tests (ubuntu + macos) and releases
 - 529+ BATS tests across all modules
 
-[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/christopherlouet/pimpmyshell/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.2.1...v0.3.0

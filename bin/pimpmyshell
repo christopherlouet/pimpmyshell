@@ -76,6 +76,7 @@ show_help() {
     echo ""
     echo -e "${BOLD}USAGE${RESET}"
     echo "    pimpmyshell <command> [options]"
+    echo "    pms <command> [options]"
     echo ""
     echo -e "${BOLD}COMMANDS${RESET}"
     echo "    apply               Apply configuration (generate .zshrc, theme, plugins)"
@@ -104,12 +105,17 @@ show_help() {
     echo "    --dry-run           Show what would be done without making changes"
     echo "    --no-backup         Skip automatic backup before apply"
     echo ""
+    echo -e "${BOLD}ALIASES${RESET}"
+    echo "    pms                             Shorthand for pimpmyshell"
+    echo "    pms-switch <name>               Shorthand for pimpmyshell profile switch"
+    echo ""
     echo -e "${BOLD}EXAMPLES${RESET}"
     echo "    pimpmyshell wizard              # Interactive setup"
     echo "    pimpmyshell apply               # Apply configuration"
     echo "    pimpmyshell theme cyberpunk     # Switch to cyberpunk theme"
     echo "    pimpmyshell tools install       # Install CLI tools"
     echo "    pimpmyshell doctor              # Check environment"
+    echo "    pms-switch work                 # Quick profile switch"
     echo ""
     echo -e "${BOLD}CONFIGURATION${RESET}"
     echo "    Config file: \${XDG_CONFIG_HOME:-~/.config}/pimpmyshell/pimpmyshell.yaml"
@@ -503,5 +509,13 @@ main() {
 
 # Run main only if not being sourced
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
+    # Detect invocation name for shortcut aliases
+    case "$(basename "$0")" in
+        pms-switch)
+            main profile switch "$@"
+            ;;
+        *)
+            main "$@"
+            ;;
+    esac
 fi

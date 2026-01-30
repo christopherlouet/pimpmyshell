@@ -198,6 +198,8 @@ WRAPPER
     fi
     return $ret
 }
+alias pms='pimpmyshell'
+alias pms-switch='pimpmyshell profile switch'
 WRAPPER
 }
 

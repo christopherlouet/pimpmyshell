@@ -326,7 +326,9 @@ setup_symlink() {
 
     chmod +x "$cli_source"
     ln -sf "$cli_source" "${PIMPMYSHELL_BIN_DIR}/pimpmyshell"
-    success "CLI available at ${PIMPMYSHELL_BIN_DIR}/pimpmyshell"
+    ln -sf "$cli_source" "${PIMPMYSHELL_BIN_DIR}/pms"
+    ln -sf "$cli_source" "${PIMPMYSHELL_BIN_DIR}/pms-switch"
+    success "CLI available at ${PIMPMYSHELL_BIN_DIR}/pimpmyshell (aliases: pms, pms-switch)"
 }
 
 # -----------------------------------------------------------------------------
@@ -474,8 +476,10 @@ uninstall_pimpmyshell() {
     echo ""
     warn "Uninstalling pimpmyshell..."
 
-    # Remove symlink
+    # Remove symlinks
     rm -f "${PIMPMYSHELL_BIN_DIR}/pimpmyshell"
+    rm -f "${PIMPMYSHELL_BIN_DIR}/pms"
+    rm -f "${PIMPMYSHELL_BIN_DIR}/pms-switch"
 
     # Remove install directory
     if [[ -z "$PIMPMYSHELL_INSTALL_DIR" || "$PIMPMYSHELL_INSTALL_DIR" == "/" || "$PIMPMYSHELL_INSTALL_DIR" == "$HOME" ]]; then
