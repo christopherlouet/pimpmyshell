@@ -14,7 +14,7 @@ jobs:
         distro:
           - { image: "fedora:latest", pkg_install: "dnf install -y bash bats git" }
           - { image: "archlinux:latest", pkg_install: "pacman -Sy --noconfirm bash bats git" }
-          - { image: "opensuse/tumbleweed:latest", pkg_install: "zypper install -y bash bats git" }
+          - { image: "opensuse/tumbleweed:latest", pkg_install: "zypper install -y bash bats git gawk findutils" }
           - { image: "alpine:latest", pkg_install: "apk add bash bats git" }
       fail-fast: false
     container:
