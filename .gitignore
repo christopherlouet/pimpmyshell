@@ -37,3 +37,6 @@ tmp/
 .claude/
 CLAUDE.md
 CLAUDE.local.md.example
+
+# Specs (planning artifacts)
+specs/
