@@ -9,10 +9,12 @@ Configure a complete, beautiful zsh environment in one command.
 - **One-command setup** - `pimpmyshell apply` configures everything
 - **7 Themes** - Cyberpunk (default), Matrix, Dracula, Catppuccin, Nord, Gruvbox, Tokyo Night
 - **Coherent styling** - Each theme applies across Starship prompt, eza colors, and GNOME Terminal
+- **Live theme switching** - Terminal foreground, background, and 16-color palette change instantly via OSC escape sequences
 - **Modern CLI tools** - Automatic installation of eza, bat, fzf, starship, fd, ripgrep, zoxide, delta
 - **Oh-My-Zsh integration** - Standard and custom plugins managed from YAML config
 - **Alias groups** - Git, Docker, Kubernetes, navigation, files
 - **Integrations** - fzf (preview with bat/eza), mise, tmux, zoxide, delta
+- **Shell completions** - Tab completion for all commands, themes, profiles (bash and zsh)
 - **Profiles** - Switch between work, personal, minimal configurations
 - **Interactive wizard** - Guided setup with `pimpmyshell wizard`
 - **Backup/restore** - Automatic backup before every change
@@ -121,6 +123,7 @@ plugins:
     - zsh-autosuggestions
     - zsh-syntax-highlighting
     - zsh-bat
+    - zsh-completions
 
 tools:
   required:
@@ -140,15 +143,20 @@ aliases:
   groups:
     - git
     - docker
+    - kubernetes
     - navigation
     - files
 
 integrations:
   fzf:
     enabled: true
+  fzf_tab:
+    enabled: false    # set to true to use fzf for Tab completion
   mise:
     enabled: true
   zoxide:
+    enabled: true
+  delta:
     enabled: true
 ```
 
@@ -174,10 +182,20 @@ Preview all themes:
 pimpmyshell theme --preview
 ```
 
-Switch theme:
+Switch theme (terminal colors change instantly):
 
 ```bash
 pimpmyshell theme matrix
+```
+
+## Shell completions
+
+Tab completion is available for bash and zsh. It covers all commands, subcommands, theme names, profile names, and options.
+
+Completions are automatically configured in the generated `.zshrc` (via `fpath`). For bash, source the completion file:
+
+```bash
+source ~/.pimpmyshell/completions/pimpmyshell.bash
 ```
 
 ## Environment diagnostics
