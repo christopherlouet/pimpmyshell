@@ -222,29 +222,51 @@ install_tool() {
         pkg_manager=$(detect_pkg_manager)
     fi
 
+    # Check if a package is explicitly defined for this pkg_manager
+    local registry_pkg
+    registry_pkg=$(_tools_registry_get ".tools.${tool_name}.packages.${pkg_manager}")
+
+    if [[ -z "$registry_pkg" && "$pkg_manager" != "unknown" ]]; then
+        # No package defined for this pkg_manager, try alternative directly
+        log_info "No $pkg_manager package for $tool_name, trying alternative..."
+        if _install_tool_alternative "$tool_name" && is_tool_installed "$tool_name"; then
+            log_success "Installed: $tool_name (alternative method)"
+            return 0
+        fi
+        local alt_cmd
+        alt_cmd=$(get_tool_alt_install "$tool_name")
+        if [[ -n "$alt_cmd" ]]; then
+            log_warn "Could not auto-install $tool_name. Try: $alt_cmd"
+        else
+            log_error "Cannot install $tool_name: no package for $pkg_manager and no alternative"
+        fi
+        return 1
+    fi
+
     local pkg_name
     pkg_name=$(get_tool_pkg_name "$tool_name" "$pkg_manager")
 
     log_info "Installing $tool_name ($pkg_name via $pkg_manager)..."
 
+    local install_status=0
     case "$pkg_manager" in
         apt)
-            run_privileged apt install -y "$pkg_name"
+            run_privileged apt install -y "$pkg_name" || install_status=$?
             ;;
         dnf)
-            run_privileged dnf install -y "$pkg_name"
+            run_privileged dnf install -y "$pkg_name" || install_status=$?
             ;;
         pacman)
-            run_privileged pacman -S --noconfirm "$pkg_name"
+            run_privileged pacman -S --noconfirm "$pkg_name" || install_status=$?
             ;;
         zypper)
-            run_privileged zypper install -y "$pkg_name"
+            run_privileged zypper install -y "$pkg_name" || install_status=$?
             ;;
         apk)
-            run_privileged apk add "$pkg_name"
+            run_privileged apk add "$pkg_name" || install_status=$?
             ;;
         brew)
-            brew install "$pkg_name"
+            brew install "$pkg_name" || install_status=$?
             ;;
         *)
             # Try alternative install (direct dispatch, no eval)
@@ -254,9 +276,7 @@ install_tool() {
             fi
             ;;
     esac
-
-    local status=$?
-    if [[ $status -eq 0 ]] && is_tool_installed "$tool_name"; then
+    if [[ $install_status -eq 0 ]] && is_tool_installed "$tool_name"; then
         log_success "Installed: $tool_name"
     else
         log_warn "Could not install $tool_name via $pkg_manager"

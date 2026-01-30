@@ -461,6 +461,51 @@ setup() {
 }
 
 # =============================================================================
+# _parse_palette_colors
+# =============================================================================
+
+@test "_parse_palette_colors function exists" {
+    declare -F _parse_palette_colors
+}
+
+@test "_parse_palette_colors converts dconf format to RRGGBB" {
+    local palette="['#0d0d1a1a2e2e', '#ff00003333']"
+    run _parse_palette_colors "$palette"
+    assert_success
+    # First color should be #0d1a2e
+    local first_line
+    first_line=$(echo "$output" | head -1)
+    [[ "$first_line" == "#0d1a2e" ]]
+}
+
+@test "_parse_palette_colors passes through short hex colors" {
+    local palette="['#ff0000', '#00ff00']"
+    run _parse_palette_colors "$palette"
+    assert_success
+    assert_output_contains "#ff0000"
+    assert_output_contains "#00ff00"
+}
+
+@test "_parse_palette_colors returns nothing for empty input" {
+    run _parse_palette_colors ""
+    assert_success
+    [[ -z "$output" ]]
+}
+
+@test "_parse_palette_colors uses THEME_PALETTE when no argument" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    load_theme "cyberpunk"
+    run _parse_palette_colors
+    assert_success
+    # Should output 16 lines (16 colors)
+    local count
+    count=$(echo "$output" | wc -l)
+    [[ "$count" -eq 16 ]]
+}
+
+# =============================================================================
 # detect_terminal
 # =============================================================================
 

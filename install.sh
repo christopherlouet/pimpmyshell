@@ -114,16 +114,16 @@ check_prerequisite_command() {
 detect_package_manager() {
     if check_prerequisite_command brew; then
         echo "brew"
-    elif check_prerequisite_command apt-get; then
+    elif check_prerequisite_command apt; then
         echo "apt"
     elif check_prerequisite_command dnf; then
         echo "dnf"
     elif check_prerequisite_command pacman; then
         echo "pacman"
-    elif check_prerequisite_command apk; then
-        echo "apk"
     elif check_prerequisite_command zypper; then
         echo "zypper"
+    elif check_prerequisite_command apk; then
+        echo "apk"
     else
         echo "unknown"
     fi

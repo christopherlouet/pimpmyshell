@@ -41,6 +41,8 @@ jobs:
             curl -fsSL -o /usr/local/bin/yq "$url"
           fi
           chmod +x /usr/local/bin/yq
+          # Verify the downloaded binary is functional
+          yq --version
 
       - name: Run bats tests
         run: bats tests/

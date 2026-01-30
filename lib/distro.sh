@@ -32,9 +32,11 @@ _read_os_release_field() {
 
     local value
     value=$(grep "^${field}=" "$os_release" 2>/dev/null | head -1 | cut -d= -f2-)
-    # Strip surrounding quotes
+    # Strip surrounding quotes (double or single)
     value="${value%\"}"
     value="${value#\"}"
+    value="${value%\'}"
+    value="${value#\'}"
     echo "$value"
 }
 

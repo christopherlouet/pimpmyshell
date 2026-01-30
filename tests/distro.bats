@@ -96,6 +96,28 @@ EOF
     assert_output_equals "unknown"
 }
 
+@test "get_distro_id handles single-quoted values in os-release" {
+    local fake_os_release="${PIMPMYSHELL_TEST_DIR}/os-release-sq"
+    cat > "$fake_os_release" << 'EOF'
+ID='gentoo'
+PRETTY_NAME='Gentoo Linux'
+EOF
+    run get_distro_id "$fake_os_release"
+    assert_success
+    assert_output_equals "gentoo"
+}
+
+@test "get_distro_pretty handles single-quoted values" {
+    local fake_os_release="${PIMPMYSHELL_TEST_DIR}/os-release-sq2"
+    cat > "$fake_os_release" << 'EOF'
+ID='gentoo'
+PRETTY_NAME='Gentoo Linux 2.15'
+EOF
+    run get_distro_pretty "$fake_os_release"
+    assert_success
+    assert_output_equals "Gentoo Linux 2.15"
+}
+
 # =============================================================================
 # get_distro_family
 # =============================================================================

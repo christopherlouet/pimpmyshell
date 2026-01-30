@@ -237,6 +237,32 @@ detect_terminal() {
 }
 
 # -----------------------------------------------------------------------------
+# Palette Parsing Helper
+# -----------------------------------------------------------------------------
+
+## Parse palette string into clean #RRGGBB hex colors (one per line)
+## Converts #RRRRGGGGBBBB (dconf format) to #RRGGBB
+## Usage: _parse_palette_colors [palette_string]
+## Defaults to THEME_PALETTE if no argument given
+_parse_palette_colors() {
+    local palette_str="${1:-${THEME_PALETTE:-}}"
+    [[ -z "$palette_str" ]] && return
+
+    local cleaned
+    cleaned=$(echo "$palette_str" | tr -d "[]'" | tr ',' '\n')
+
+    while IFS= read -r color; do
+        color=$(echo "$color" | tr -d ' ')
+        [[ -z "$color" ]] && continue
+        # Convert #RRRRGGGGBBBB to #RRGGBB
+        if [[ ${#color} -eq 13 ]]; then
+            color="#${color:1:2}${color:5:2}${color:9:2}"
+        fi
+        echo "$color"
+    done <<< "$cleaned"
+}
+
+# -----------------------------------------------------------------------------
 # Theme Generation (config file content)
 # -----------------------------------------------------------------------------
 
@@ -252,19 +278,12 @@ _generate_kitty_theme() {
 
     # Parse palette if available
     if [[ -n "${THEME_PALETTE:-}" ]]; then
-        local cleaned i=0
-        cleaned=$(echo "$THEME_PALETTE" | tr -d "[]'" | tr ',' '\n')
+        local i=0
         while IFS= read -r color; do
-            color=$(echo "$color" | tr -d ' ')
-            [[ -z "$color" ]] && continue
-            # Convert #RRRRGGGGBBBB to #RRGGBB
-            if [[ ${#color} -eq 13 ]]; then
-                color="#${color:1:2}${color:5:2}${color:9:2}"
-            fi
             echo "color${i} ${color}"
             ((i++))
             [[ $i -ge 16 ]] && break
-        done <<< "$cleaned"
+        done < <(_parse_palette_colors)
     fi
 }
 
@@ -280,16 +299,10 @@ _generate_alacritty_theme() {
 
     # Parse palette for normal and bright colors
     if [[ -n "${THEME_PALETTE:-}" ]]; then
-        local cleaned colors=()
-        cleaned=$(echo "$THEME_PALETTE" | tr -d "[]'" | tr ',' '\n')
+        local colors=()
         while IFS= read -r color; do
-            color=$(echo "$color" | tr -d ' ')
-            [[ -z "$color" ]] && continue
-            if [[ ${#color} -eq 13 ]]; then
-                color="#${color:1:2}${color:5:2}${color:9:2}"
-            fi
             colors+=("$color")
-        done <<< "$cleaned"
+        done < <(_parse_palette_colors)
 
         if [[ ${#colors[@]} -ge 8 ]]; then
             echo ""
@@ -349,13 +362,10 @@ _generate_konsole_theme() {
 
     # Parse palette for color slots
     if [[ -n "${THEME_PALETTE:-}" ]]; then
-        local cleaned colors=()
-        cleaned=$(echo "$THEME_PALETTE" | tr -d "[]'" | tr ',' '\n')
+        local colors=()
         while IFS= read -r color; do
-            color=$(echo "$color" | tr -d ' ')
-            [[ -z "$color" ]] && continue
             colors+=("$color")
-        done <<< "$cleaned"
+        done < <(_parse_palette_colors)
 
         local i
         for i in "${!colors[@]}"; do
@@ -463,23 +473,13 @@ _gnome_find_profile() {
 _apply_osc_palette() {
     local palette_str="$1"
 
-    # Strip brackets and quotes, split by comma
-    local cleaned
-    cleaned=$(echo "$palette_str" | tr -d "[]'" | tr ',' '\n')
-
     local i=0
     while IFS= read -r color; do
-        color=$(echo "$color" | tr -d ' ')
-        [[ -z "$color" ]] && continue
-        # Convert #RRRRGGGGBBBB to #RRGGBB (take first 2 hex digits of each channel)
-        if [[ ${#color} -eq 13 ]]; then
-            color="#${color:1:2}${color:5:2}${color:9:2}"
-        fi
         # OSC 4;index;color ST
         printf '\033]4;%d;%s\033\\' "$i" "$color"
         ((i++))
         [[ $i -ge 16 ]] && break
-    done <<< "$cleaned"
+    done < <(_parse_palette_colors "$palette_str")
 }
 
 ## Apply terminal foreground and background colors
@@ -590,21 +590,14 @@ COLORS
 
     # Add OSC 4 palette sequences if palette is available
     if [[ -n "${THEME_PALETTE:-}" ]]; then
-        local cleaned i=0
-        cleaned=$(echo "$THEME_PALETTE" | tr -d "[]'" | tr ',' '\n')
+        local i=0
         while IFS= read -r color; do
-            color=$(echo "$color" | tr -d ' ')
-            [[ -z "$color" ]] && continue
-            # Convert #RRRRGGGGBBBB to #RRGGBB
-            if [[ ${#color} -eq 13 ]]; then
-                color="#${color:1:2}${color:5:2}${color:9:2}"
-            fi
             cat >> "$colors_file" <<COLORS
     printf '\\033]4;${i};${color}\\033\\\\' > /dev/tty 2>/dev/null
 COLORS
             ((i++))
             [[ $i -ge 16 ]] && break
-        done <<< "$cleaned"
+        done < <(_parse_palette_colors)
     fi
 
     cat >> "$colors_file" <<'COLORS'

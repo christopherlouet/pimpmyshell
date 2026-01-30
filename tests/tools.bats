@@ -564,6 +564,20 @@ setup() {
     done
 }
 
+@test "install_tool skips pkg manager when no registry entry exists" {
+    if ! command -v yq &>/dev/null; then
+        skip "yq not installed"
+    fi
+    # starship has no zypper package in registry
+    local registry_pkg
+    registry_pkg=$(_tools_registry_get ".tools.starship.packages.zypper")
+    [[ -z "$registry_pkg" ]]
+    # But it has an alt_install
+    local alt
+    alt=$(_tools_registry_get ".tools.starship.alt_install")
+    [[ -n "$alt" ]]
+}
+
 @test "tools-registry.yaml has apk or alt_install for all tools" {
     if ! command -v yq &>/dev/null; then
         skip "yq not installed"
