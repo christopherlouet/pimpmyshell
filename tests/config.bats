@@ -44,7 +44,7 @@ setup() {
 @test "detect_yq_version returns go, python, or empty" {
     run detect_yq_version
     assert_success
-    [[ "$output" =~ ^(go|python|)$ ]]
+    [[ "$output" == "go" || "$output" == "python" || -z "$output" ]]
 }
 
 @test "require_yq succeeds when yq is installed" {
