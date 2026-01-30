@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-01-30
+
+### Added
+
+- Interactive wizard v2 with step-based navigation engine (back/quit/next between 7 steps)
+- Visual ASCII progress bar (`[====>    ] Step 3/7`) for wizard steps
+- Descriptions for all 25 plugins, alias groups, and integrations in wizard selection
+- Theme preview with ANSI truecolor swatches during theme selection (`_wizard_theme_swatch`, `_wizard_theme_label`)
+- Tool selection step showing installed status markers (✓/✗), required tools always included
+- Profile save step: optionally save wizard config as a named profile via `lib/profiles.sh`
+- `fzf_tab` added to integrations list and config generation
+- Input validation with retry loops (max 3 attempts) for `_wizard_choose`, `_wizard_choose_multi`, `_wizard_confirm`
+- `_wizard_get_desc` function-based description lookup (30 entries across plugins, aliases, integrations)
+- `_wizard_nav_prompt` navigation between wizard steps with auto-mode passthrough
+- `_WIZARD_STEPS` step registry array for declarative wizard flow
+- `WIZARD_TOOLS` and `WIZARD_PROFILE` state variables
+- 45 new wizard tests (82 total), full suite 757 tests passing
+
+### Changed
+
+- `run_wizard()` refactored from linear call sequence to step loop with back navigation support
+- Wizard step functions now receive `(step_num, total)` parameters instead of hardcoded numbers
+- `_wizard_generate_config` uses `WIZARD_TOOLS` for dynamic recommended tools list
+- `fzf_tab` integration now driven by wizard selection (was always `false`)
+
 ## [0.3.1] - 2026-01-30
 
 ### Added
@@ -116,7 +141,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD: GitHub Actions for tests (ubuntu + macos) and releases
 - 529+ BATS tests across all modules
 
-[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/christopherlouet/pimpmyshell/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/christopherlouet/pimpmyshell/compare/v0.2.0...v0.2.1
