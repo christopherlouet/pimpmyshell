@@ -24,6 +24,24 @@ colors:
 # sky: "#89dceb"
 # sapphire: "#74c7ec"
 # lavender: "#b4befe"
+terminal:
+  palette:
+    - "#45475A" # color0 - black (Surface0)
+    - "#F38BA8" # color1 - red
+    - "#A6E3A1" # color2 - green
+    - "#F9E2AF" # color3 - yellow
+    - "#89B4FA" # color4 - blue
+    - "#F5C2E7" # color5 - magenta (pink)
+    - "#94E2D5" # color6 - cyan (teal)
+    - "#BAC2DE" # color7 - white (Subtext0)
+    - "#585B70" # color8 - bright black (Surface2)
+    - "#F38BA8" # color9 - bright red
+    - "#A6E3A1" # color10 - bright green
+    - "#F9E2AF" # color11 - bright yellow
+    - "#89B4FA" # color12 - bright blue
+    - "#F5C2E7" # color13 - bright magenta
+    - "#94E2D5" # color14 - bright cyan
+    - "#A6ADC8" # color15 - bright white (Subtext1)
 separators:
   left: ""
   right: ""

@@ -6,11 +6,12 @@ palette = "cyberpunk"
 
 format = """
 [](neon_pink)\
+$os\
 $directory\
-[](bg:neon_cyan fg:neon_pink)\
+[](bg:cyberpunk_gray fg:neon_pink)\
 $git_branch\
 $git_status\
-[](fg:neon_cyan)\
+[](fg:cyberpunk_gray)\
 $git_state\
 $cmd_duration\
 $fill\
@@ -25,6 +26,52 @@ $character"""
 [fill]
 symbol = " "
 
+[os]
+disabled = false
+style = "bold fg:dark_bg bg:neon_pink"
+format = "[$symbol]($style)"
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Windows = "󰍲 "
+
 [character]
 success_symbol = "[❯](bold neon_cyan)"
 error_symbol = "[❯](bold neon_red)"
@@ -34,39 +81,39 @@ vimcmd_symbol = "[❮](bold neon_pink)"
 show_always = false
 style_user = "bold fg:dark_bg bg:neon_pink"
 style_root = "bold fg:dark_bg bg:neon_red"
-format = "[ $user ]($style)"
+format = "[$user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "bold fg:dark_bg bg:neon_cyan"
-format = "[ $hostname ]($style)"
+style = "bold fg:dark_bg bg:neon_pink"
+format = "[@$hostname ]($style)"
 
 [directory]
 style = "bold fg:dark_bg bg:neon_pink"
-format = "[ $path ]($style)"
+format = "[$path ]($style)"
 truncation_length = 3
 truncate_to_repo = false
 read_only = " 󰌾"
 read_only_style = "fg:neon_red bg:neon_pink"
 
 [git_branch]
-symbol = " "
-style = "bold fg:dark_bg bg:neon_cyan"
+symbol = ""
+style = "bold fg:neon_cyan bg:cyberpunk_gray"
 format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "bold fg:dark_bg bg:neon_cyan"
-format = '([$all_status$ahead_behind ]($style))'
-ahead = "⇡${count}"
-behind = "⇣${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
-conflicted = "="
-untracked = "?"
-stashed = "📦"
-modified = "!"
-staged = "+"
-renamed = "»"
-deleted = "✘"
+style = "bold fg:neon_yellow bg:cyberpunk_gray"
+format = '([$all_status$ahead_behind]($style))'
+ahead = " ${count}"
+behind = " ${count}"
+diverged = " ${ahead_count} ${behind_count}"
+conflicted = " "
+untracked = "󰋗 "
+stashed = "󰆓 "
+modified = "󰏬 "
+staged = "󰄬 "
+renamed = "󰁔 "
+deleted = "󰅖 "
 
 [git_state]
 format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
@@ -75,7 +122,7 @@ style = "bold neon_orange"
 [cmd_duration]
 min_time = 2_000
 style = "bold neon_purple"
-format = " ⏱ [$duration]($style)"
+format = "  [$duration]($style)"
 
 [line_break]
 disabled = false
@@ -121,7 +168,7 @@ disabled = true
 [time]
 disabled = true
 style = "neon_cyan"
-format = "⏰ [$time]($style) "
+format = " [$time]($style) "
 
 [battery]
 disabled = true
@@ -140,3 +187,4 @@ neon_purple = "#bf00ff"
 neon_blue = "#00bfff"
 neon_red = "#ff0040"
 dark_bg = "#0a0a0f"
+cyberpunk_gray = "#2a2a2a"

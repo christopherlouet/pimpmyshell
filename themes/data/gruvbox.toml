@@ -6,11 +6,12 @@ palette = "gruvbox_dark"
 
 format = """
 [](gruvbox_yellow)\
+$os\
 $directory\
-[](bg:gruvbox_orange fg:gruvbox_yellow)\
+[](bg:gruvbox_bg2 fg:gruvbox_yellow)\
 $git_branch\
 $git_status\
-[](fg:gruvbox_orange)\
+[](fg:gruvbox_bg2)\
 $git_state\
 $cmd_duration\
 $fill\
@@ -25,6 +26,52 @@ $character"""
 [fill]
 symbol = " "
 
+[os]
+disabled = false
+style = "bold fg:gruvbox_bg0 bg:gruvbox_yellow"
+format = "[$symbol]($style)"
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Windows = "󰍲 "
+
 [character]
 success_symbol = "[❯](bold gruvbox_green)"
 error_symbol = "[❯](bold gruvbox_red)"
@@ -34,39 +81,39 @@ vimcmd_symbol = "[❮](bold gruvbox_aqua)"
 show_always = false
 style_user = "bold fg:gruvbox_bg0 bg:gruvbox_yellow"
 style_root = "bold fg:gruvbox_bg0 bg:gruvbox_red"
-format = "[ $user ]($style)"
+format = "[$user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "bold fg:gruvbox_bg0 bg:gruvbox_blue"
-format = "[ $hostname ]($style)"
+style = "bold fg:gruvbox_bg0 bg:gruvbox_yellow"
+format = "[@$hostname ]($style)"
 
 [directory]
 style = "bold fg:gruvbox_bg0 bg:gruvbox_yellow"
-format = "[ $path ]($style)"
+format = "[$path ]($style)"
 truncation_length = 3
 truncate_to_repo = false
 read_only = " 󰌾"
 read_only_style = "fg:gruvbox_red bg:gruvbox_yellow"
 
 [git_branch]
-symbol = " "
-style = "bold fg:gruvbox_bg0 bg:gruvbox_orange"
+symbol = ""
+style = "bold fg:gruvbox_orange bg:gruvbox_bg2"
 format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "bold fg:gruvbox_bg0 bg:gruvbox_orange"
-format = '([$all_status$ahead_behind ]($style))'
-ahead = "↑${count}"
-behind = "↓${count}"
-diverged = "↕↑${ahead_count}↓${behind_count}"
-conflicted = "≠"
-untracked = "?"
-stashed = "≡"
-modified = "!"
-staged = "+"
-renamed = "»"
-deleted = "✘"
+style = "bold fg:gruvbox_yellow bg:gruvbox_bg2"
+format = '([$all_status$ahead_behind]($style))'
+ahead = " ${count}"
+behind = " ${count}"
+diverged = " ${ahead_count} ${behind_count}"
+conflicted = " "
+untracked = "󰋗 "
+stashed = "󰆓 "
+modified = "󰏬 "
+staged = "󰄬 "
+renamed = "󰁔 "
+deleted = "󰅖 "
 
 [git_state]
 format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
@@ -75,14 +122,14 @@ style = "bold gruvbox_purple"
 [cmd_duration]
 min_time = 2_000
 style = "bold gruvbox_gray"
-format = " ⏱ [$duration]($style)"
+format = "  [$duration]($style)"
 
 [line_break]
 disabled = false
 
 # Language indicators
 [nodejs]
-symbol = " "
+symbol = "⬡ "
 style = "gruvbox_green"
 format = "[$symbol($version)]($style) "
 
@@ -107,7 +154,7 @@ style = "gruvbox_blue"
 format = "[$symbol$context]($style) "
 
 [kubernetes]
-symbol = "⎈ "
+symbol = "☸ "
 style = "gruvbox_purple"
 format = "[$symbol$context]($style) "
 disabled = true
@@ -121,7 +168,14 @@ disabled = true
 [time]
 disabled = true
 style = "gruvbox_gray"
-format = "[$time]($style) "
+format = " [$time]($style) "
+
+[battery]
+disabled = true
+
+[[battery.display]]
+threshold = 30
+style = "gruvbox_red bold"
 
 [palettes.gruvbox_dark]
 # Background

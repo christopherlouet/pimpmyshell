@@ -14,6 +14,24 @@ colors:
   comment: "#6272a4" # Muted purple
   selection: "#1a1a3e" # Dark purple selection
   border: "#2a2a4e" # Purple border
+terminal:
+  palette:
+    - "#0A0A1A" # color0 - black
+    - "#FF0040" # color1 - red
+    - "#39FF14" # color2 - green
+    - "#FFFF00" # color3 - yellow
+    - "#00BFFF" # color4 - blue
+    - "#FF00FF" # color5 - magenta
+    - "#00FFFF" # color6 - cyan
+    - "#FFFFFF" # color7 - white
+    - "#1A1A2E" # color8 - bright black
+    - "#FF0040" # color9 - bright red
+    - "#39FF14" # color10 - bright green
+    - "#FFFF00" # color11 - bright yellow
+    - "#00BFFF" # color12 - bright blue
+    - "#FF00FF" # color13 - bright magenta
+    - "#00FFFF" # color14 - bright cyan
+    - "#FFFFFF" # color15 - bright white
 separators:
   left: "" # Powerline arrow right
   right: "" # Powerline arrow left

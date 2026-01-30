@@ -21,6 +21,24 @@ colors:
 # teal: "#1abc9c"
 # dark_blue: "#3d59a1"
 # dark_purple: "#9d7cd8"
+terminal:
+  palette:
+    - "#1A1B26" # color0 - black (bg)
+    - "#F7768E" # color1 - red
+    - "#9ECE6A" # color2 - green
+    - "#E0AF68" # color3 - yellow
+    - "#7AA2F7" # color4 - blue
+    - "#BB9AF7" # color5 - magenta
+    - "#7DCFFF" # color6 - cyan
+    - "#A9B1D6" # color7 - white (fg_dark)
+    - "#414868" # color8 - bright black (terminal_black)
+    - "#F7768E" # color9 - bright red
+    - "#9ECE6A" # color10 - bright green
+    - "#E0AF68" # color11 - bright yellow
+    - "#7AA2F7" # color12 - bright blue
+    - "#BB9AF7" # color13 - bright magenta
+    - "#7DCFFF" # color14 - bright cyan
+    - "#C0CAF5" # color15 - bright white (fg)
 separators:
   left: ""
   right: ""

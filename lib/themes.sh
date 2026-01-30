@@ -91,6 +91,55 @@ theme_get() {
     fi
 }
 
+## Get terminal palette from theme YAML as dconf-formatted string
+## Usage: theme_get_palette <theme_file>
+## Returns: "['#hex0', '#hex1', ..., '#hex15']" or empty string
+theme_get_palette() {
+    local theme_file="$1"
+
+    if [[ ! -f "$theme_file" ]]; then
+        echo ""
+        return
+    fi
+
+    require_yq || return 1
+
+    local yq_type
+    yq_type=$(detect_yq_version)
+
+    local colors=""
+    local color
+    for i in $(seq 0 15); do
+        case "$yq_type" in
+            go)
+                color=$(yq eval ".terminal.palette[$i]" "$theme_file" 2>/dev/null)
+                ;;
+            python)
+                color=$(yq -r ".terminal.palette[$i]" "$theme_file" 2>/dev/null)
+                ;;
+        esac
+
+        if [[ -z "$color" || "$color" == "null" ]]; then
+            echo ""
+            return
+        fi
+
+        # Expand to full #RRRRGGGGBBBB format for dconf
+        local r="${color:1:2}"
+        local g="${color:3:2}"
+        local b="${color:5:2}"
+        local expanded="#${r}${r}${g}${g}${b}${b}"
+
+        if [[ -n "$colors" ]]; then
+            colors="${colors}, '${expanded}'"
+        else
+            colors="'${expanded}'"
+        fi
+    done
+
+    echo "[${colors}]"
+}
+
 ## Load a theme and export its colors as variables
 ## Usage: load_theme <theme_name>
 ## Sets: THEME_* variables
@@ -145,6 +194,10 @@ load_theme() {
     THEME_ICON_CPU=$(theme_get "$theme_file" ".icons.cpu" "")
     THEME_ICON_MEMORY=$(theme_get "$theme_file" ".icons.memory" "")
 
+    # Export terminal palette (16 ANSI colors for GNOME Terminal)
+    export THEME_PALETTE
+    THEME_PALETTE=$(theme_get_palette "$theme_file")
+
     log_verbose "Loaded theme: $THEME_NAME"
     return 0
 }
@@ -152,6 +205,163 @@ load_theme() {
 # -----------------------------------------------------------------------------
 # Theme application functions
 # -----------------------------------------------------------------------------
+
+## Find a GNOME Terminal profile UUID by visible name
+## Usage: _gnome_find_profile <name>
+## Returns: UUID or empty string
+_gnome_find_profile() {
+    local target_name="$1"
+    local uuid name
+
+    for uuid in $(dconf list /org/gnome/terminal/legacy/profiles:/ 2>/dev/null | grep -oP '[a-f0-9-]{36}'); do
+        name=$(dconf read "/org/gnome/terminal/legacy/profiles:/:${uuid}/visible-name" 2>/dev/null | tr -d "'")
+        if [[ "$name" == "$target_name" ]]; then
+            echo "$uuid"
+            return 0
+        fi
+    done
+    return 1
+}
+
+## Send OSC 4 escape sequences to reprogram the 16 ANSI palette colors
+## Usage: _apply_osc_palette <dconf_palette_string>
+## Input format: "['#RRRRGGGGBBBB', '#RRRRGGGGBBBB', ...]"
+_apply_osc_palette() {
+    local palette_str="$1"
+
+    # Strip brackets and quotes, split by comma
+    local cleaned
+    cleaned=$(echo "$palette_str" | tr -d "[]'" | tr ',' '\n')
+
+    local i=0
+    while IFS= read -r color; do
+        color=$(echo "$color" | tr -d ' ')
+        [[ -z "$color" ]] && continue
+        # Convert #RRRRGGGGBBBB to #RRGGBB (take first 2 hex digits of each channel)
+        if [[ ${#color} -eq 13 ]]; then
+            color="#${color:1:2}${color:5:2}${color:9:2}"
+        fi
+        # OSC 4;index;color ST
+        printf '\033]4;%d;%s\033\\' "$i" "$color"
+        ((i++))
+        [[ $i -ge 16 ]] && break
+    done <<< "$cleaned"
+}
+
+## Apply terminal foreground and background colors
+## Uses OSC escape codes for immediate effect + GNOME dconf for persistence
+## Usage: apply_terminal_colors
+## Requires: THEME_BG, THEME_FG, THEME_NAME, THEME_PALETTE to be set (via load_theme)
+apply_terminal_colors() {
+    local profile_id=""
+
+    # 1. Tmux: set pane fg/bg for immediate effect
+    if [[ -n "${TMUX:-}" ]] && check_command tmux; then
+        tmux set -g window-style "fg=${THEME_FG},bg=${THEME_BG}"
+        tmux set -g window-active-style "fg=${THEME_FG},bg=${THEME_BG}"
+        log_verbose "Applied tmux pane colors: fg=$THEME_FG bg=$THEME_BG"
+    fi
+
+    # 2. OSC escape codes: immediate fg/bg/palette change in current terminal
+    if (echo -n > /dev/tty) 2>/dev/null; then
+        {
+            printf '\033]10;%s\033\\' "$THEME_FG"
+            printf '\033]11;%s\033\\' "$THEME_BG"
+            # Apply ANSI palette colors (OSC 4) if available
+            if [[ -n "${THEME_PALETTE:-}" ]]; then
+                _apply_osc_palette "$THEME_PALETTE"
+            fi
+        } > /dev/tty
+        log_verbose "Applied OSC terminal colors: fg=$THEME_FG bg=$THEME_BG"
+    fi
+
+    # 3. GNOME Terminal: update profile via dconf for persistence (new windows/tabs)
+    if check_command dconf && dconf list /org/gnome/terminal/legacy/profiles:/ &>/dev/null; then
+        profile_id=$(_gnome_find_profile "$THEME_NAME")
+
+        if [[ -n "$profile_id" ]]; then
+            local profile_path="/org/gnome/terminal/legacy/profiles:/:${profile_id}"
+            dconf write "${profile_path}/foreground-color" "'${THEME_FG}'"
+            dconf write "${profile_path}/background-color" "'${THEME_BG}'"
+            dconf write "${profile_path}/use-theme-colors" "false"
+            dconf write "${profile_path}/bold-is-bright" "true"
+            if [[ -n "${THEME_PALETTE:-}" ]]; then
+                dconf write "${profile_path}/palette" "${THEME_PALETTE}"
+            fi
+            dconf write /org/gnome/terminal/legacy/profiles:/default "'${profile_id}'"
+            log_verbose "Switched GNOME Terminal to profile: $THEME_NAME ($profile_id)"
+        else
+            profile_id=$(dconf read /org/gnome/terminal/legacy/profiles:/default 2>/dev/null | tr -d "'")
+            if [[ -n "$profile_id" ]]; then
+                local profile_path="/org/gnome/terminal/legacy/profiles:/:${profile_id}"
+                dconf write "${profile_path}/foreground-color" "'${THEME_FG}'"
+                dconf write "${profile_path}/background-color" "'${THEME_BG}'"
+                dconf write "${profile_path}/use-theme-colors" "false"
+                dconf write "${profile_path}/bold-is-bright" "true"
+                dconf write "${profile_path}/visible-name" "'${THEME_NAME}'"
+                if [[ -n "${THEME_PALETTE:-}" ]]; then
+                    dconf write "${profile_path}/palette" "${THEME_PALETTE}"
+                fi
+                log_verbose "Updated default GNOME Terminal profile for: $THEME_NAME"
+            fi
+        fi
+    fi
+
+    # Generate a shell script for startup so colors persist across new shells
+    local colors_dir="${PIMPMYSHELL_DATA_DIR}/colors"
+    local colors_file="${colors_dir}/terminal-colors.sh"
+
+    mkdir -p "$colors_dir"
+
+    cat > "$colors_file" <<COLORS
+# Terminal colors generated by pimpmyshell
+# Theme: ${THEME_NAME}
+# Applied: $(date '+%Y-%m-%d %H:%M:%S')
+COLORS
+
+    # Tmux pane colors
+    cat >> "$colors_file" <<'COLORS'
+if [[ -n "${TMUX:-}" ]] && command -v tmux &>/dev/null; then
+COLORS
+    cat >> "$colors_file" <<COLORS
+    tmux set -g window-style "fg=${THEME_FG},bg=${THEME_BG}" 2>/dev/null
+    tmux set -g window-active-style "fg=${THEME_FG},bg=${THEME_BG}" 2>/dev/null
+fi
+COLORS
+
+    # OSC escape codes for immediate fg/bg/palette in current terminal
+    cat >> "$colors_file" <<COLORS
+if [[ -w /dev/tty ]]; then
+    printf '\\033]10;${THEME_FG}\\033\\\\' > /dev/tty 2>/dev/null
+    printf '\\033]11;${THEME_BG}\\033\\\\' > /dev/tty 2>/dev/null
+COLORS
+
+    # Add OSC 4 palette sequences if palette is available
+    if [[ -n "${THEME_PALETTE:-}" ]]; then
+        local cleaned i=0
+        cleaned=$(echo "$THEME_PALETTE" | tr -d "[]'" | tr ',' '\n')
+        while IFS= read -r color; do
+            color=$(echo "$color" | tr -d ' ')
+            [[ -z "$color" ]] && continue
+            # Convert #RRRRGGGGBBBB to #RRGGBB
+            if [[ ${#color} -eq 13 ]]; then
+                color="#${color:1:2}${color:5:2}${color:9:2}"
+            fi
+            cat >> "$colors_file" <<COLORS
+    printf '\\033]4;${i};${color}\\033\\\\' > /dev/tty 2>/dev/null
+COLORS
+            ((i++))
+            [[ $i -ge 16 ]] && break
+        done <<< "$cleaned"
+    fi
+
+    cat >> "$colors_file" <<'COLORS'
+fi
+COLORS
+
+    log_verbose "Applied terminal colors: fg=$THEME_FG bg=$THEME_BG"
+    return 0
+}
 
 ## Apply Starship prompt theme
 ## Usage: apply_starship_theme <theme_name>
@@ -224,6 +434,12 @@ apply_theme() {
 
     # Apply eza theme
     apply_eza_theme "$theme_name" || log_warn "Could not apply eza theme"
+
+    # Apply terminal colors (foreground + background)
+    apply_terminal_colors || log_warn "Could not apply terminal colors"
+
+    # Persist theme choice in config
+    set_config '.theme' "$theme_name" || log_warn "Could not persist theme in config"
 
     log_verbose "Theme applied: $theme_name"
     return 0

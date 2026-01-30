@@ -21,6 +21,24 @@ colors:
 # nord10: "#5e81ac" # Frost
 # nord12: "#d08770" # Aurora (orange)
 # nord15: "#b48ead" # Aurora (purple)
+terminal:
+  palette:
+    - "#3B4252" # color0 - black (nord1)
+    - "#BF616A" # color1 - red (nord11)
+    - "#A3BE8C" # color2 - green (nord14)
+    - "#EBCB8B" # color3 - yellow (nord13)
+    - "#81A1C1" # color4 - blue (nord9)
+    - "#B48EAD" # color5 - magenta (nord15)
+    - "#88C0D0" # color6 - cyan (nord8)
+    - "#E5E9F0" # color7 - white (nord5)
+    - "#4C566A" # color8 - bright black (nord3)
+    - "#BF616A" # color9 - bright red
+    - "#A3BE8C" # color10 - bright green
+    - "#EBCB8B" # color11 - bright yellow
+    - "#81A1C1" # color12 - bright blue
+    - "#B48EAD" # color13 - bright magenta
+    - "#8FBCBB" # color14 - bright cyan (nord7)
+    - "#ECEFF4" # color15 - bright white (nord6)
 separators:
   left: ""
   right: ""

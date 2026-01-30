@@ -17,6 +17,24 @@ colors:
 # Additional Dracula colors for reference:
 # cyan: "#8be9fd"
 # orange: "#ffb86c"
+terminal:
+  palette:
+    - "#282A36" # color0 - black
+    - "#FF5555" # color1 - red
+    - "#50FA7B" # color2 - green
+    - "#F1FA8C" # color3 - yellow
+    - "#BD93F9" # color4 - blue
+    - "#FF79C6" # color5 - magenta
+    - "#8BE9FD" # color6 - cyan
+    - "#F8F8F2" # color7 - white
+    - "#6272A4" # color8 - bright black
+    - "#FF6E6E" # color9 - bright red
+    - "#69FF94" # color10 - bright green
+    - "#FFFFA5" # color11 - bright yellow
+    - "#D6ACFF" # color12 - bright blue
+    - "#FF92DF" # color13 - bright magenta
+    - "#A4FFFF" # color14 - bright cyan
+    - "#FFFFFF" # color15 - bright white
 separators:
   left: ""
   right: ""

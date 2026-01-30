@@ -26,6 +26,24 @@ colors:
 # aqua: "#8ec07c"
 # blue: "#83a598"
 # purple: "#d3869b"
+terminal:
+  palette:
+    - "#282828" # color0 - black (bg0)
+    - "#CC241D" # color1 - red
+    - "#98971A" # color2 - green
+    - "#D79921" # color3 - yellow
+    - "#458588" # color4 - blue
+    - "#B16286" # color5 - magenta (purple)
+    - "#689D6A" # color6 - cyan (aqua)
+    - "#A89984" # color7 - white (fg4)
+    - "#928374" # color8 - bright black (gray)
+    - "#FB4934" # color9 - bright red
+    - "#B8BB26" # color10 - bright green
+    - "#FABD2F" # color11 - bright yellow
+    - "#83A598" # color12 - bright blue
+    - "#D3869B" # color13 - bright magenta
+    - "#8EC07C" # color14 - bright cyan (aqua)
+    - "#EBDBB2" # color15 - bright white (fg1)
 separators:
   left: ""
   right: ""

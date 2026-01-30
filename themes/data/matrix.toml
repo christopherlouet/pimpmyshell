@@ -1,16 +1,17 @@
 # Matrix Theme for Starship
 # Green on black, classic hacker aesthetic - Powerline style
-# "Wake up, Neo..."
+# "Wake up, Neo... The Matrix has you."
 
 palette = "matrix"
 
 format = """
 [](matrix_green)\
+$os\
 $directory\
-[](bg:matrix_bright_green fg:matrix_green)\
+[](bg:matrix_gray fg:matrix_green)\
 $git_branch\
 $git_status\
-[](fg:matrix_bright_green)\
+[](fg:matrix_gray)\
 $git_state\
 $cmd_duration\
 $fill\
@@ -25,6 +26,52 @@ $character"""
 [fill]
 symbol = " "
 
+[os]
+disabled = false
+style = "bold fg:matrix_black bg:matrix_green"
+format = "[$symbol]($style)"
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Windows = "󰍲 "
+
 [character]
 success_symbol = "[❯](bold matrix_green)"
 error_symbol = "[❯](bold matrix_red)"
@@ -33,40 +80,40 @@ vimcmd_symbol = "[❮](bold matrix_green)"
 [username]
 show_always = false
 style_user = "bold fg:matrix_black bg:matrix_green"
-style_root = "bold fg:matrix_black bg:matrix_red"
-format = "[ $user ]($style)"
+style_root = "bold fg:matrix_red bg:matrix_green"
+format = "[$user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "bold fg:matrix_black bg:matrix_bright_green"
-format = "[ $hostname ]($style)"
+style = "bold fg:matrix_black bg:matrix_green"
+format = "[@$hostname ]($style)"
 
 [directory]
 style = "bold fg:matrix_black bg:matrix_green"
-format = "[ $path ]($style)"
+format = "[$path ]($style)"
 truncation_length = 3
 truncate_to_repo = false
 read_only = " 󰌾"
 read_only_style = "fg:matrix_red bg:matrix_green"
 
 [git_branch]
-symbol = " "
-style = "bold fg:matrix_black bg:matrix_bright_green"
+symbol = ""
+style = "bold fg:matrix_bright_green bg:matrix_gray"
 format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "bold fg:matrix_black bg:matrix_bright_green"
-format = '([$all_status$ahead_behind ]($style))'
-ahead = "⇡${count}"
-behind = "⇣${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
-conflicted = "="
-untracked = "?"
-stashed = "$"
-modified = "!"
-staged = "+"
-renamed = "»"
-deleted = "✘"
+style = "bold fg:matrix_yellow bg:matrix_gray"
+format = '([$all_status$ahead_behind]($style))'
+ahead = " ${count}"
+behind = " ${count}"
+diverged = " ${ahead_count} ${behind_count}"
+conflicted = " "
+untracked = "󰋗 "
+stashed = "󰆓 "
+modified = "󰏬 "
+staged = "󰄬 "
+renamed = "󰁔 "
+deleted = "󰅖 "
 
 [git_state]
 format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
@@ -75,14 +122,14 @@ style = "bold matrix_yellow"
 [cmd_duration]
 min_time = 2_000
 style = "bold matrix_dim_green"
-format = " ⏱ [$duration]($style)"
+format = "  [$duration]($style)"
 
 [line_break]
 disabled = false
 
 # Language/Tool indicators
 [nodejs]
-symbol = " "
+symbol = "⬡ "
 style = "matrix_green"
 format = "[$symbol($version)]($style) "
 
@@ -93,7 +140,7 @@ format = "[$symbol$pyenv_prefix($version)]($style) "
 
 [rust]
 symbol = " "
-style = "matrix_green"
+style = "matrix_yellow"
 format = "[$symbol($version)]($style) "
 
 [golang]
@@ -107,8 +154,8 @@ style = "matrix_bright_green"
 format = "[$symbol$context]($style) "
 
 [kubernetes]
-symbol = "⎈ "
-style = "matrix_green"
+symbol = "☸ "
+style = "matrix_dim_green"
 format = "[$symbol$context]($style) "
 disabled = true
 
@@ -121,12 +168,21 @@ disabled = true
 [time]
 disabled = true
 style = "matrix_dim_green"
-format = "[$time]($style) "
+format = " [$time]($style) "
+
+[battery]
+disabled = true
+
+[[battery.display]]
+threshold = 30
+style = "matrix_red bold"
 
 [palettes.matrix]
 matrix_green = "#00ff00"
 matrix_bright_green = "#00ff41"
 matrix_dim_green = "#008f11"
+matrix_dark_green = "#003b00"
+matrix_gray = "#2a2a2a"
 matrix_yellow = "#ccff00"
 matrix_red = "#ff0000"
 matrix_black = "#0d0d0d"

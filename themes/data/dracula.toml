@@ -6,11 +6,12 @@ palette = "dracula"
 
 format = """
 [](dracula_purple)\
+$os\
 $directory\
-[](bg:dracula_pink fg:dracula_purple)\
+[](bg:dracula_current fg:dracula_purple)\
 $git_branch\
 $git_status\
-[](fg:dracula_pink)\
+[](fg:dracula_current)\
 $git_state\
 $cmd_duration\
 $fill\
@@ -25,6 +26,52 @@ $character"""
 [fill]
 symbol = " "
 
+[os]
+disabled = false
+style = "bold fg:dracula_background bg:dracula_purple"
+format = "[$symbol]($style)"
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Windows = "󰍲 "
+
 [character]
 success_symbol = "[❯](bold dracula_purple)"
 error_symbol = "[❯](bold dracula_red)"
@@ -32,41 +79,41 @@ vimcmd_symbol = "[❮](bold dracula_green)"
 
 [username]
 show_always = false
-style_user = "bold fg:dracula_background bg:dracula_pink"
+style_user = "bold fg:dracula_background bg:dracula_purple"
 style_root = "bold fg:dracula_background bg:dracula_red"
-format = "[ $user ]($style)"
+format = "[$user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "bold fg:dracula_background bg:dracula_cyan"
-format = "[ $hostname ]($style)"
+style = "bold fg:dracula_background bg:dracula_purple"
+format = "[@$hostname ]($style)"
 
 [directory]
 style = "bold fg:dracula_background bg:dracula_purple"
-format = "[ $path ]($style)"
+format = "[$path ]($style)"
 truncation_length = 3
 truncate_to_repo = false
 read_only = " 󰌾"
 read_only_style = "fg:dracula_red bg:dracula_purple"
 
 [git_branch]
-symbol = " "
-style = "bold fg:dracula_background bg:dracula_pink"
+symbol = ""
+style = "bold fg:dracula_pink bg:dracula_current"
 format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "bold fg:dracula_background bg:dracula_pink"
-format = '([$all_status$ahead_behind ]($style))'
-ahead = "⇡${count}"
-behind = "⇣${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
-conflicted = "="
-untracked = "?"
-stashed = "$"
-modified = "!"
-staged = "+"
-renamed = "»"
-deleted = "✘"
+style = "bold fg:dracula_yellow bg:dracula_current"
+format = '([$all_status$ahead_behind]($style))'
+ahead = " ${count}"
+behind = " ${count}"
+diverged = " ${ahead_count} ${behind_count}"
+conflicted = " "
+untracked = "󰋗 "
+stashed = "󰆓 "
+modified = "󰏬 "
+staged = "󰄬 "
+renamed = "󰁔 "
+deleted = "󰅖 "
 
 [git_state]
 format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
@@ -75,14 +122,14 @@ style = "bold dracula_yellow"
 [cmd_duration]
 min_time = 2_000
 style = "bold dracula_yellow"
-format = " ⏱ [$duration]($style)"
+format = "  [$duration]($style)"
 
 [line_break]
 disabled = false
 
 # Language indicators
 [nodejs]
-symbol = " "
+symbol = "⬡ "
 style = "dracula_green"
 format = "[$symbol($version)]($style) "
 
@@ -107,7 +154,7 @@ style = "dracula_cyan"
 format = "[$symbol$context]($style) "
 
 [kubernetes]
-symbol = "⎈ "
+symbol = "☸ "
 style = "dracula_purple"
 format = "[$symbol$context]($style) "
 disabled = true
@@ -121,7 +168,14 @@ disabled = true
 [time]
 disabled = true
 style = "dracula_comment"
-format = "[$time]($style) "
+format = " [$time]($style) "
+
+[battery]
+disabled = true
+
+[[battery.display]]
+threshold = 30
+style = "dracula_red bold"
 
 [palettes.dracula]
 dracula_background = "#282a36"

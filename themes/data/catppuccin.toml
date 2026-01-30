@@ -6,11 +6,12 @@ palette = "catppuccin_mocha"
 
 format = """
 [](ctp_blue)\
+$os\
 $directory\
-[](bg:ctp_pink fg:ctp_blue)\
+[](bg:ctp_surface1 fg:ctp_blue)\
 $git_branch\
 $git_status\
-[](fg:ctp_pink)\
+[](fg:ctp_surface1)\
 $git_state\
 $cmd_duration\
 $fill\
@@ -25,6 +26,52 @@ $character"""
 [fill]
 symbol = " "
 
+[os]
+disabled = false
+style = "bold fg:ctp_crust bg:ctp_blue"
+format = "[$symbol]($style)"
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Windows = "󰍲 "
+
 [character]
 success_symbol = "[❯](bold ctp_green)"
 error_symbol = "[❯](bold ctp_red)"
@@ -32,41 +79,41 @@ vimcmd_symbol = "[❮](bold ctp_mauve)"
 
 [username]
 show_always = false
-style_user = "bold fg:ctp_crust bg:ctp_pink"
+style_user = "bold fg:ctp_crust bg:ctp_blue"
 style_root = "bold fg:ctp_crust bg:ctp_red"
-format = "[ $user ]($style)"
+format = "[$user ]($style)"
 
 [hostname]
 ssh_only = true
-style = "bold fg:ctp_crust bg:ctp_teal"
-format = "[ $hostname ]($style)"
+style = "bold fg:ctp_crust bg:ctp_blue"
+format = "[@$hostname ]($style)"
 
 [directory]
 style = "bold fg:ctp_crust bg:ctp_blue"
-format = "[ $path ]($style)"
+format = "[$path ]($style)"
 truncation_length = 3
 truncate_to_repo = false
 read_only = " 󰌾"
 read_only_style = "fg:ctp_red bg:ctp_blue"
 
 [git_branch]
-symbol = " "
-style = "bold fg:ctp_crust bg:ctp_pink"
+symbol = ""
+style = "bold fg:ctp_pink bg:ctp_surface1"
 format = "[ $symbol$branch ]($style)"
 
 [git_status]
-style = "bold fg:ctp_crust bg:ctp_pink"
-format = '([$all_status$ahead_behind ]($style))'
-ahead = "↑${count}"
-behind = "↓${count}"
-diverged = "↕↑${ahead_count}↓${behind_count}"
-conflicted = "~"
-untracked = "?"
-stashed = "*"
-modified = "!"
-staged = "+"
-renamed = "»"
-deleted = "x"
+style = "bold fg:ctp_yellow bg:ctp_surface1"
+format = '([$all_status$ahead_behind]($style))'
+ahead = " ${count}"
+behind = " ${count}"
+diverged = " ${ahead_count} ${behind_count}"
+conflicted = " "
+untracked = "󰋗 "
+stashed = "󰆓 "
+modified = "󰏬 "
+staged = "󰄬 "
+renamed = "󰁔 "
+deleted = "󰅖 "
 
 [git_state]
 format = '[ \($state( $progress_current/$progress_total)\) ]($style)'
@@ -75,14 +122,14 @@ style = "bold ctp_yellow"
 [cmd_duration]
 min_time = 2_000
 style = "bold ctp_yellow"
-format = " ⏱ [$duration]($style)"
+format = "  [$duration]($style)"
 
 [line_break]
 disabled = false
 
 # Language indicators
 [nodejs]
-symbol = " "
+symbol = "⬡ "
 style = "ctp_green"
 format = "[$symbol($version)]($style) "
 
@@ -107,7 +154,7 @@ style = "ctp_blue"
 format = "[$symbol$context]($style) "
 
 [kubernetes]
-symbol = "⎈ "
+symbol = "☸ "
 style = "ctp_mauve"
 format = "[$symbol$context]($style) "
 disabled = true
@@ -121,7 +168,14 @@ disabled = true
 [time]
 disabled = true
 style = "ctp_subtext0"
-format = "[$time]($style) "
+format = " [$time]($style) "
+
+[battery]
+disabled = true
+
+[[battery.display]]
+threshold = 30
+style = "ctp_red bold"
 
 [palettes.catppuccin_mocha]
 ctp_rosewater = "#f5e0dc"

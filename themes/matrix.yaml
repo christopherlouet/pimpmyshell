@@ -6,26 +6,44 @@ description: Digital rain - Classic green terminal aesthetic
 colors:
   bg: "#000000"
   fg: "#00ff00"
-  accent: "#00ff00" # Matrix green
-  accent2: "#008800" # Darker green
+  accent: "#00ff41" # Matrix bright green
+  accent2: "#008f11" # Dim green
   warning: "#ccff00" # Yellow-green
   error: "#ff0000" # Red pill
   success: "#00ff44" # Bright green
-  comment: "#005500" # Dark green
+  comment: "#004a0e" # Dark green
   selection: "#003300" # Very dark green
-  border: "#004400" # Green border
+  border: "#008f11" # Green border
+terminal:
+  palette:
+    - "#0D0D0D" # color0 - black
+    - "#FF0000" # color1 - red
+    - "#00FF00" # color2 - green
+    - "#CCFF00" # color3 - yellow
+    - "#003300" # color4 - blue
+    - "#00FF00" # color5 - magenta
+    - "#00CCCC" # color6 - cyan
+    - "#00FF00" # color7 - white
+    - "#003300" # color8 - bright black
+    - "#FF0000" # color9 - bright red
+    - "#00FF00" # color10 - bright green
+    - "#CCFF00" # color11 - bright yellow
+    - "#00FF00" # color12 - bright blue
+    - "#00FF00" # color13 - bright magenta
+    - "#00FFFF" # color14 - bright cyan
+    - "#FFFFFF" # color15 - bright white
 separators:
   left: ""
   right: ""
   left_alt: ""
   right_alt: ""
 icons:
-  session: "\U000F17A9" # Matrix symbol
-  window: ""
-  pane: ""
-  git: ""
-  time: ""
-  cpu: ""
-  memory: ""
-  battery: ""
-  network: "\U000F05A9"
+  session: "" # Terminal
+  window: "" # Window
+  pane: "" # Layout
+  git: "" # Git branch
+  time: "" # Clock
+  cpu: "" # CPU/chip
+  memory: "" # Memory
+  battery: "" # Battery
+  network: "\U000F05A9" # Network
