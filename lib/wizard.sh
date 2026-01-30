@@ -126,10 +126,12 @@ _wizard_choose_multi() {
     fi
 
     if _use_gum; then
-        gum choose --no-limit --header "$prompt" "${options[@]}"
+        local selected_csv
+        selected_csv=$(IFS=,; echo "${options[*]}")
+        gum choose --no-limit --selected="$selected_csv" --header "$prompt" "${options[@]}"
     else
         echo "$prompt"
-        echo "(Enter numbers separated by spaces, or 'all')"
+        echo "(Enter numbers separated by spaces, 'all', or Enter to keep all)"
         local i=1
         for opt in "${options[@]}"; do
             echo "  $i) $opt"
@@ -278,7 +280,7 @@ _wizard_step_plugins() {
     done <<< "$selected_omz"
 
     # Custom plugins
-    local custom_options=("zsh-autosuggestions" "zsh-syntax-highlighting" "zsh-bat" "zsh-completions" "fzf-tab")
+    local custom_options=("zsh-autosuggestions" "zsh-syntax-highlighting" "zsh-bat" "zsh-completions")
     local selected_custom
     selected_custom=$(_wizard_choose_multi "Select custom plugins:" "${custom_options[@]}")
 
@@ -452,6 +454,8 @@ _wizard_generate_config() {
 
         echo "  fzf:"
         echo "    enabled: $fzf_enabled"
+        echo "  fzf_tab:"
+        echo "    enabled: false"
         echo "  mise:"
         echo "    enabled: $mise_enabled"
         echo "  tmux:"

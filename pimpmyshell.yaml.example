@@ -93,6 +93,10 @@ integrations:
     enabled: true
     preview: true
     keybindings: true
+  fzf_tab:
+    # Use fzf for Tab completion (replaces default zsh completion menu)
+    # Set to false for standard zsh completion
+    enabled: false
   tmux:
     auto_start: false
   mise:
