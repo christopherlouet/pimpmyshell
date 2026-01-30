@@ -47,8 +47,10 @@ setup() {
 }
 
 @test "detect_yq_version returns empty when yq not available" {
-    # Override PATH to hide yq
-    PATH="/usr/bin:/bin" run detect_yq_version
+    # Override PATH to an empty temp dir to hide yq
+    local empty_dir="${PIMPMYSHELL_TEST_DIR}/empty_bin"
+    mkdir -p "$empty_dir"
+    PATH="$empty_dir" run detect_yq_version
     assert_success
     [[ -z "$output" ]]
 }
@@ -66,7 +68,9 @@ setup() {
 }
 
 @test "require_yq fails when yq not available" {
-    PATH="/usr/bin:/bin" run require_yq
+    local empty_dir="${PIMPMYSHELL_TEST_DIR}/empty_bin"
+    mkdir -p "$empty_dir"
+    PATH="$empty_dir" run require_yq
     assert_failure
     assert_output_contains "yq is required"
 }
