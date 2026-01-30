@@ -342,3 +342,19 @@ setup() {
     [[ -f "$b1" ]]
     [[ -f "$b2" ]]
 }
+
+# =============================================================================
+# Argument validation
+# =============================================================================
+
+@test "restore_file fails without arguments" {
+    run restore_file
+    assert_failure
+    assert_output_contains "restore_file"
+}
+
+@test "get_latest_backup fails without arguments" {
+    run get_latest_backup
+    assert_failure
+    assert_output_contains "get_latest_backup"
+}

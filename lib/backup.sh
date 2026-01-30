@@ -59,6 +59,7 @@ backup_file() {
 ## Restore a file from backup
 ## Usage: restore_file <backup_path> <target_path>
 restore_file() {
+    _require_args "restore_file" 2 $# || return 1
     local backup_path="$1"
     local target_path="$2"
 
@@ -107,6 +108,7 @@ list_backups() {
 ## Get the most recent backup for a file
 ## Usage: get_latest_backup <filename>
 get_latest_backup() {
+    _require_args "get_latest_backup" 1 $# || return 1
     local filename="$1"
 
     if [[ ! -d "$PIMPMYSHELL_BACKUP_DIR" ]]; then

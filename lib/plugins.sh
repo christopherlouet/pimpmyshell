@@ -35,6 +35,7 @@ OMZ_CUSTOM_DIR="${ZSH_CUSTOM:-$OMZ_DIR/custom}"
 ## Usage: get_plugin_url <plugin_name>
 ## Returns: URL or empty string if unknown
 get_plugin_url() {
+    _require_args "get_plugin_url" 1 $# || return 1
     local plugin_name="$1"
     case "$plugin_name" in
         zsh-autosuggestions)
@@ -171,6 +172,7 @@ validate_git_url() {
 ## Clone a custom plugin from its git URL
 ## Usage: clone_custom_plugin <plugin_name> [url]
 clone_custom_plugin() {
+    _require_args "clone_custom_plugin" 1 $# || return 1
     local plugin_name="$1"
     local url="${2:-}"
     local target_dir="${OMZ_CUSTOM_DIR}/plugins/${plugin_name}"
@@ -244,6 +246,7 @@ install_plugins() {
 ## Usage: get_configured_plugins <type>
 ## Types: "ohmyzsh" or "custom"
 get_configured_plugins() {
+    _require_args "get_configured_plugins" 1 $# || return 1
     local plugin_type="$1"
     get_config_list ".plugins.${plugin_type}"
 }

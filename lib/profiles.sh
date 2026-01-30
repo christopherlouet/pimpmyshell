@@ -99,6 +99,7 @@ list_profiles() {
 ## Usage: profile_exists <name>
 ## Returns: 0 if exists, 1 if not
 profile_exists() {
+    _require_args "profile_exists" 1 $# || return 1
     local name="$1"
     [[ -d "${PIMPMYSHELL_PROFILES_DIR}/${name}" ]]
 }
@@ -120,6 +121,7 @@ get_current_profile() {
 ## Usage: create_profile <name>
 ## Copies config from current profile
 create_profile() {
+    _require_args "create_profile" 1 $# || return 1
     local name="$1"
 
     # Validate name
@@ -152,6 +154,7 @@ create_profile() {
 ## Switch to a different profile
 ## Usage: switch_profile <name>
 switch_profile() {
+    _require_args "switch_profile" 1 $# || return 1
     local name="$1"
 
     if ! profile_exists "$name"; then
@@ -172,6 +175,7 @@ switch_profile() {
 ## Delete a profile
 ## Usage: delete_profile <name>
 delete_profile() {
+    _require_args "delete_profile" 1 $# || return 1
     local name="$1"
 
     # Cannot delete default
@@ -208,6 +212,7 @@ delete_profile() {
 ## Usage: get_profile_config_path <name>
 ## Returns: path on stdout
 get_profile_config_path() {
+    _require_args "get_profile_config_path" 1 $# || return 1
     local name="$1"
 
     if ! profile_exists "$name"; then

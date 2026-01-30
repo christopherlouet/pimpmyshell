@@ -36,6 +36,8 @@ export PIMPMYSHELL_TEMPLATES_DIR="${PIMPMYSHELL_ROOT}/templates"
 source "${PIMPMYSHELL_LIB_DIR}/core.sh"
 # shellcheck source=../lib/config.sh
 source "${PIMPMYSHELL_LIB_DIR}/config.sh"
+# shellcheck source=../lib/zshrc-gen.sh
+source "${PIMPMYSHELL_LIB_DIR}/zshrc-gen.sh"
 # shellcheck source=../lib/themes.sh
 source "${PIMPMYSHELL_LIB_DIR}/themes.sh"
 # shellcheck source=../lib/plugins.sh

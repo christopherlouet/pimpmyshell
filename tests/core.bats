@@ -247,6 +247,32 @@ setup() {
 }
 
 # =============================================================================
+# _require_args
+# =============================================================================
+
+@test "_require_args succeeds when enough arguments" {
+    run _require_args "my_func" 2 3
+    assert_success
+}
+
+@test "_require_args succeeds when exact argument count" {
+    run _require_args "my_func" 2 2
+    assert_success
+}
+
+@test "_require_args fails when too few arguments" {
+    run _require_args "my_func" 2 0
+    assert_failure
+    assert_output_contains "my_func"
+    assert_output_contains "expected at least 2"
+}
+
+@test "_require_args fails with zero args when one required" {
+    run _require_args "test_fn" 1 0
+    assert_failure
+}
+
+# =============================================================================
 # String utilities
 # =============================================================================
 

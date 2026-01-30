@@ -325,3 +325,37 @@ setup() {
     run get_all_tools "required"
     assert_success
 }
+
+# =============================================================================
+# Argument validation
+# =============================================================================
+
+@test "get_tool_command fails without arguments" {
+    run get_tool_command
+    assert_failure
+    assert_output_contains "get_tool_command"
+}
+
+@test "is_tool_installed fails without arguments" {
+    run is_tool_installed
+    assert_failure
+    assert_output_contains "is_tool_installed"
+}
+
+@test "get_tool_pkg_name fails with only one argument" {
+    run get_tool_pkg_name "bat"
+    assert_failure
+    assert_output_contains "get_tool_pkg_name"
+}
+
+@test "install_tool fails without arguments" {
+    run install_tool
+    assert_failure
+    assert_output_contains "install_tool"
+}
+
+@test "get_all_tools fails without arguments" {
+    run get_all_tools
+    assert_failure
+    assert_output_contains "get_all_tools"
+}

@@ -361,3 +361,37 @@ setup() {
     assert_success
     assert_output_contains "Hello World"
 }
+
+# =============================================================================
+# Argument validation
+# =============================================================================
+
+@test "yq_get fails without arguments" {
+    run yq_get
+    assert_failure
+    assert_output_contains "yq_get"
+}
+
+@test "get_config fails without arguments" {
+    run get_config
+    assert_failure
+    assert_output_contains "get_config"
+}
+
+@test "set_config fails without arguments" {
+    run set_config
+    assert_failure
+    assert_output_contains "set_config"
+}
+
+@test "config_enabled fails without arguments" {
+    run config_enabled
+    assert_failure
+    assert_output_contains "config_enabled"
+}
+
+@test "get_config_list fails without arguments" {
+    run get_config_list
+    assert_failure
+    assert_output_contains "get_config_list"
+}
