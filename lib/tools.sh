@@ -138,6 +138,42 @@ get_tool_alt_install() {
     esac
 }
 
+## Install a tool using its alternative method (cargo, npm, git clone, etc.)
+## Direct dispatch without eval for security
+## Usage: _install_tool_alternative <tool_name>
+_install_tool_alternative() {
+    local tool_name="$1"
+    case "$tool_name" in
+        eza)        cargo install eza ;;
+        bat)        cargo install bat ;;
+        fd)         cargo install fd-find ;;
+        ripgrep)    cargo install ripgrep ;;
+        zoxide)     cargo install zoxide ;;
+        delta)      cargo install git-delta ;;
+        dust)       cargo install du-dust ;;
+        hyperfine)  cargo install hyperfine ;;
+        starship)
+            local tmp_script
+            tmp_script=$(mktemp)
+            trap 'rm -f "$tmp_script"' RETURN
+            if curl -sS -o "$tmp_script" https://starship.rs/install.sh; then
+                sh "$tmp_script"
+            else
+                log_error "Failed to download starship installer"
+                return 1
+            fi
+            ;;
+        tldr)       npm install -g tldr ;;
+        fzf)
+            git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install
+            ;;
+        *)
+            log_error "No alternative install method for: $tool_name"
+            return 1
+            ;;
+    esac
+}
+
 ## Install a single tool using the system package manager
 ## Usage: install_tool <tool_name> [pkg_manager]
 install_tool() {
@@ -172,13 +208,8 @@ install_tool() {
             brew install "$pkg_name"
             ;;
         *)
-            # Try alternative install
-            local alt_cmd
-            alt_cmd=$(get_tool_alt_install "$tool_name")
-            if [[ -n "$alt_cmd" ]]; then
-                log_info "Using alternative install: $alt_cmd"
-                eval "$alt_cmd"
-            else
+            # Try alternative install (direct dispatch, no eval)
+            if ! _install_tool_alternative "$tool_name"; then
                 log_error "Cannot install $tool_name: no package manager or alternative found"
                 return 1
             fi

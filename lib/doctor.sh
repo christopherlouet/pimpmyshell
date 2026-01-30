@@ -275,7 +275,7 @@ check_doctor_config() {
 
     # Validate YAML syntax
     if check_command yq; then
-        if yq eval '.' "$config_file" >/dev/null 2>&1; then
+        if yq_validate "$config_file" 2>/dev/null; then
             _doctor_pass "YAML syntax valid"
         else
             _doctor_fail "YAML syntax invalid"

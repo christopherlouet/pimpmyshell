@@ -294,6 +294,32 @@ setup() {
 # Edge cases
 # =============================================================================
 
+# =============================================================================
+# _install_tool_alternative - Direct dispatch (no eval)
+# =============================================================================
+
+@test "_install_tool_alternative function exists" {
+    declare -F _install_tool_alternative
+}
+
+@test "_install_tool_alternative fails for unknown tool" {
+    run _install_tool_alternative "nonexistent_tool_xyz"
+    assert_failure
+    assert_output_contains "No alternative install method"
+}
+
+@test "install_tool does not use eval" {
+    # Verify eval is not used in the install_tool function
+    local tools_file="${PIMPMYSHELL_ROOT}/lib/tools.sh"
+    run grep -n 'eval ' "$tools_file"
+    # Should find no eval calls in install_tool context
+    refute_output_contains 'eval "$alt_cmd"'
+}
+
+# =============================================================================
+# Edge cases
+# =============================================================================
+
 @test "tools functions handle missing config gracefully" {
     export PIMPMYSHELL_CONFIG_FILE="/nonexistent/config.yaml"
     run get_all_tools "required"

@@ -12,6 +12,12 @@ if [[ -z "${_PIMPMYSHELL_CORE_LOADED:-}" ]]; then
     source "${PIMPMYSHELL_LIB_DIR:-$(dirname "${BASH_SOURCE[0]}")}/core.sh"
 fi
 
+# Ensure yq-utils is loaded
+if [[ -z "${_PIMPMYSHELL_YQ_UTILS_LOADED:-}" ]]; then
+    # shellcheck source=./yq-utils.sh
+    source "${PIMPMYSHELL_LIB_DIR:-$(dirname "${BASH_SOURCE[0]}")}/yq-utils.sh"
+fi
+
 # -----------------------------------------------------------------------------
 # Constants
 # -----------------------------------------------------------------------------
@@ -31,84 +37,14 @@ readonly VALID_PROMPT_ENGINES=("starship" "p10k" "none")
 readonly VALID_THEMES=("cyberpunk" "matrix" "dracula" "catppuccin" "nord" "gruvbox" "tokyo-night")
 
 # -----------------------------------------------------------------------------
-# YAML Parsing
+# YAML Parsing (delegates to yq-utils.sh)
 # -----------------------------------------------------------------------------
-
-## Check if yq is available and which version
-## Returns: "go" for Go version, "python" for Python version, "" if not found
-detect_yq_version() {
-    if ! check_command yq; then
-        echo ""
-        return
-    fi
-
-    # Go version: "yq (https://github.com/mikefarah/yq/) version v4.x.x"
-    # Python version: "yq 2.x.x"
-    if yq --version 2>&1 | grep -q "mikefarah"; then
-        echo "go"
-    elif yq --version 2>&1 | grep -qE "^yq [0-9]"; then
-        echo "python"
-    else
-        echo "go"  # Assume Go version for newer installations
-    fi
-}
-
-## Require yq to be installed
-## Exits with error if yq is not available
-require_yq() {
-    if ! check_command yq; then
-        log_error "yq is required but not installed."
-        log_error ""
-        log_error "Install yq (Go version recommended):"
-        log_error "  macOS:   brew install yq"
-        log_error "  Linux:   sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq"
-        log_error "  Snap:    sudo snap install yq"
-        log_error ""
-        log_error "More info: https://github.com/mikefarah/yq"
-        return 1
-    fi
-}
 
 ## Get a value from YAML file using yq
 ## Usage: yq_get <file> <path>
 ## Example: yq_get config.yaml '.theme'
 yq_get() {
-    local file="$1"
-    local path="$2"
-
-    if [[ ! -f "$file" ]]; then
-        log_error "Config file not found: $file"
-        return 1
-    fi
-
-    require_yq || return 1
-
-    local yq_type
-    yq_type=$(detect_yq_version)
-
-    local result
-    case "$yq_type" in
-        go)
-            result=$(yq eval "$path" "$file" 2>/dev/null)
-            if [[ "$result" == "null" || -z "$result" ]]; then
-                echo ""
-            else
-                echo "$result"
-            fi
-            ;;
-        python)
-            result=$(yq -r "$path" "$file" 2>/dev/null)
-            if [[ "$result" == "null" || -z "$result" ]]; then
-                echo ""
-            else
-                echo "$result"
-            fi
-            ;;
-        *)
-            log_error "yq is required for YAML parsing"
-            return 1
-            ;;
-    esac
+    yq_eval "$@"
 }
 
 ## Get a config value with default fallback
@@ -141,23 +77,7 @@ set_config() {
         return 1
     fi
 
-    require_yq || return 1
-
-    local yq_type
-    yq_type=$(detect_yq_version)
-
-    case "$yq_type" in
-        go)
-            yq eval "${path} = \"${value}\"" -i "$config_file" 2>/dev/null
-            ;;
-        python)
-            yq -y --in-place "${path} = \"${value}\"" "$config_file" 2>/dev/null
-            ;;
-        *)
-            log_error "yq is required to update config"
-            return 1
-            ;;
-    esac
+    yq_write "$config_file" "$path" "$value" || return 1
 
     log_verbose "Config updated: ${path} = ${value}"
     return 0
@@ -181,32 +101,7 @@ get_config_list() {
     local path="$1"
     local config_file="${PIMPMYSHELL_CONFIG_FILE:-$DEFAULT_CONFIG_FILE}"
 
-    if [[ ! -f "$config_file" ]]; then
-        return 0
-    fi
-
-    require_yq || return 1
-
-    local yq_type
-    yq_type=$(detect_yq_version)
-
-    local result
-    case "$yq_type" in
-        go)
-            result=$(yq eval "${path}[]" "$config_file" 2>/dev/null)
-            ;;
-        python)
-            result=$(yq -r "${path}[]" "$config_file" 2>/dev/null)
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-
-    # Filter out null/empty
-    if [[ -n "$result" && "$result" != "null" ]]; then
-        echo "$result"
-    fi
+    yq_eval_list "$config_file" "$path"
 }
 
 # -----------------------------------------------------------------------------

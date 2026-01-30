@@ -264,6 +264,73 @@ setup() {
     assert_failure
 }
 
+# =============================================================================
+# validate_git_url - URL validation
+# =============================================================================
+
+@test "validate_git_url accepts valid GitHub HTTPS URL" {
+    run validate_git_url "https://github.com/zsh-users/zsh-autosuggestions.git"
+    assert_success
+}
+
+@test "validate_git_url accepts GitHub URL without .git suffix" {
+    run validate_git_url "https://github.com/zsh-users/zsh-autosuggestions"
+    assert_success
+}
+
+@test "validate_git_url rejects HTTP URL" {
+    run validate_git_url "http://github.com/zsh-users/zsh-autosuggestions.git"
+    assert_failure
+    assert_output_contains "must use HTTPS"
+}
+
+@test "validate_git_url rejects non-GitHub URL" {
+    run validate_git_url "https://gitlab.com/user/repo.git"
+    assert_failure
+    assert_output_contains "must be from github.com"
+}
+
+@test "validate_git_url rejects git:// protocol" {
+    run validate_git_url "git://github.com/user/repo.git"
+    assert_failure
+    assert_output_contains "must use HTTPS"
+}
+
+@test "validate_git_url rejects ext:: injection" {
+    run validate_git_url "ext::sh -c 'malicious command'"
+    assert_failure
+    assert_output_contains "must use HTTPS"
+}
+
+@test "validate_git_url rejects URL with semicolon" {
+    run validate_git_url "https://github.com/user/repo;rm -rf /"
+    assert_failure
+    assert_output_contains "suspicious pattern"
+}
+
+@test "validate_git_url rejects URL with pipe" {
+    run validate_git_url "https://github.com/user/repo|malicious"
+    assert_failure
+    assert_output_contains "suspicious pattern"
+}
+
+@test "validate_git_url rejects URL with command substitution" {
+    run validate_git_url 'https://github.com/user/$(whoami)'
+    assert_failure
+    assert_output_contains "suspicious pattern"
+}
+
+@test "clone_custom_plugin validates URL before cloning" {
+    # Verify that clone_custom_plugin uses validate_git_url
+    local plugins_file="${PIMPMYSHELL_ROOT}/lib/plugins.sh"
+    run grep -A5 "validate_git_url" "$plugins_file"
+    assert_success
+}
+
+# =============================================================================
+# Edge cases
+# =============================================================================
+
 @test "is_plugin_installed works with empty ZSH directory" {
     mkdir -p "$ZSH"
     run is_plugin_installed "git"

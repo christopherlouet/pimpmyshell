@@ -134,6 +134,37 @@ is_plugin_installed() {
 }
 
 # -----------------------------------------------------------------------------
+# URL Validation
+# -----------------------------------------------------------------------------
+
+## Validate a git URL for security (whitelist HTTPS GitHub URLs)
+## Usage: validate_git_url <url>
+## Returns: 0 if valid, 1 if invalid
+validate_git_url() {
+    local url="$1"
+
+    # Must be HTTPS
+    if [[ "$url" != https://* ]]; then
+        log_error "Invalid plugin URL (must use HTTPS): $url"
+        return 1
+    fi
+
+    # Must be on github.com
+    if [[ "$url" != https://github.com/* ]]; then
+        log_error "Invalid plugin URL (must be from github.com): $url"
+        return 1
+    fi
+
+    # Reject suspicious patterns (ext::, command injection attempts)
+    if [[ "$url" == *"ext::"* || "$url" == *";"* || "$url" == *"|"* || "$url" == *'$('* || "$url" == *'`'* ]]; then
+        log_error "Invalid plugin URL (suspicious pattern detected): $url"
+        return 1
+    fi
+
+    return 0
+}
+
+# -----------------------------------------------------------------------------
 # Plugin Installation
 # -----------------------------------------------------------------------------
 
@@ -157,6 +188,11 @@ clone_custom_plugin() {
 
     if [[ -z "$url" ]]; then
         log_error "No URL found for custom plugin: $plugin_name"
+        return 1
+    fi
+
+    # Validate URL before cloning
+    if ! validate_git_url "$url"; then
         return 1
     fi
 

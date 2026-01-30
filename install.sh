@@ -10,6 +10,13 @@
 set -euo pipefail
 
 # -----------------------------------------------------------------------------
+# Standalone utilities
+# NOTE: These functions duplicate lib/core.sh and lib/tools.sh intentionally.
+# install.sh must be self-contained for `curl | bash` usage where lib/ is not
+# yet available. Do NOT source lib/ here - it may not exist at runtime.
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 # Colors and formatting
 # -----------------------------------------------------------------------------
 
@@ -334,7 +341,11 @@ install_from_local() {
     fi
 
     info "Installing from local repository..."
-    rm -rf "$PIMPMYSHELL_INSTALL_DIR"
+    if [[ -z "$PIMPMYSHELL_INSTALL_DIR" || "$PIMPMYSHELL_INSTALL_DIR" == "/" || "$PIMPMYSHELL_INSTALL_DIR" == "$HOME" ]]; then
+        error "Refusing to remove unsafe path: ${PIMPMYSHELL_INSTALL_DIR:-empty}"
+        return 1
+    fi
+    rm -rf "${PIMPMYSHELL_INSTALL_DIR:?}"
     cp -r "$script_dir" "$PIMPMYSHELL_INSTALL_DIR"
     success "Installed from local"
 }
@@ -439,7 +450,11 @@ uninstall_pimpmyshell() {
     rm -f "${PIMPMYSHELL_BIN_DIR}/pimpmyshell"
 
     # Remove install directory
-    rm -rf "$PIMPMYSHELL_INSTALL_DIR"
+    if [[ -z "$PIMPMYSHELL_INSTALL_DIR" || "$PIMPMYSHELL_INSTALL_DIR" == "/" || "$PIMPMYSHELL_INSTALL_DIR" == "$HOME" ]]; then
+        error "Refusing to remove unsafe path: ${PIMPMYSHELL_INSTALL_DIR:-empty}"
+        return 1
+    fi
+    rm -rf "${PIMPMYSHELL_INSTALL_DIR:?}"
 
     # Remove completions
     rm -f "${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions/_pimpmyshell"
