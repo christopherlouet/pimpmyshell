@@ -10,7 +10,7 @@ _PIMPMYSHELL_CORE_LOADED=1
 # Constants
 # -----------------------------------------------------------------------------
 
-PIMPMYSHELL_VERSION="${PIMPMYSHELL_VERSION:-0.2.1}"
+PIMPMYSHELL_VERSION="${PIMPMYSHELL_VERSION:-0.3.0}"
 PIMPMYSHELL_CONFIG_DIR="${PIMPMYSHELL_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/pimpmyshell}"
 PIMPMYSHELL_DATA_DIR="${PIMPMYSHELL_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/pimpmyshell}"
 PIMPMYSHELL_CACHE_DIR="${PIMPMYSHELL_CACHE_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/pimpmyshell}"

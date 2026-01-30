@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-01-30
+
+### Added
+
+- `lib/yq-utils.sh`: centralized yq abstraction layer (`yq_eval`, `yq_eval_list`, `yq_write`, `yq_validate`)
+- `lib/zshrc-gen.sh`: extracted 14 `.zshrc` generation functions from `config.sh` (single responsibility)
+- `_require_args` helper in `core.sh` for standardized argument validation across all lib files
+- `config/tools-registry.yaml`: data-driven tool metadata (commands, packages, alt_install)
+- `scripts/shellcheck.sh`: local shellcheck runner matching CI configuration
+- 18 yq-utils tests, 4 `_require_args` tests, 25 argument validation tests, 10 registry tests, 16 edge case tests
+- Git URL validation with `_validate_git_url` to prevent command injection
+
+### Changed
+
+- `config.sh` reduced from 529 to 150 lines by extracting generation logic and delegating yq to `yq-utils.sh`
+- `tools.sh` reads tool metadata from YAML registry instead of hardcoded case statements
+- CI shellcheck separated into dedicated job (ubuntu-only) for faster feedback
+- `install.sh` uses `_safe_rm` wrapper instead of raw `rm -rf`
+- `eval` replaced with `declare -g` for safe variable assignment in `themes.sh`
+
+### Fixed
+
+- `validate_config` empty-arg handling using `$#` check
+- PATH override in yq-utils tests for CI compatibility
+- Shellcheck SC2034 suppressions for cross-file readonly constants
+
 ## [0.2.1] - 2026-01-30
 
 ### Fixed
@@ -68,7 +94,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD: GitHub Actions for tests (ubuntu + macos) and releases
 - 529+ BATS tests across all modules
 
-[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/christopherlouet/pimpmyshell/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/christopherlouet/pimpmyshell/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/christopherlouet/pimpmyshell/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/christopherlouet/pimpmyshell/releases/tag/v0.1.0
