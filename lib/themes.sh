@@ -104,20 +104,10 @@ theme_get_palette() {
 
     require_yq || return 1
 
-    local yq_type
-    yq_type=$(detect_yq_version)
-
     local colors=""
     local color
     for i in $(seq 0 15); do
-        case "$yq_type" in
-            go)
-                color=$(yq eval ".terminal.palette[$i]" "$theme_file" 2>/dev/null)
-                ;;
-            python)
-                color=$(yq -r ".terminal.palette[$i]" "$theme_file" 2>/dev/null)
-                ;;
-        esac
+        color=$(yq_eval "$theme_file" ".terminal.palette[$i]")
 
         if [[ -z "$color" || "$color" == "null" ]]; then
             echo ""

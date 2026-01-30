@@ -374,6 +374,59 @@ setup() {
 # main routing
 # =============================================================================
 
+# =============================================================================
+# rm -rf safety guards
+# =============================================================================
+
+@test "install_from_local refuses empty PIMPMYSHELL_INSTALL_DIR" {
+    export PIMPMYSHELL_INSTALL_DIR=""
+    export PIMPMYSHELL_SCRIPT_DIR="$PIMPMYSHELL_ROOT"
+    run install_from_local
+    assert_failure
+    assert_output_contains "unsafe path"
+}
+
+@test "install_from_local refuses root path" {
+    export PIMPMYSHELL_INSTALL_DIR="/"
+    export PIMPMYSHELL_SCRIPT_DIR="$PIMPMYSHELL_ROOT"
+    run install_from_local
+    assert_failure
+    assert_output_contains "unsafe path"
+}
+
+@test "install_from_local refuses HOME path" {
+    export PIMPMYSHELL_INSTALL_DIR="$HOME"
+    export PIMPMYSHELL_SCRIPT_DIR="$PIMPMYSHELL_ROOT"
+    run install_from_local
+    assert_failure
+    assert_output_contains "unsafe path"
+}
+
+@test "uninstall_pimpmyshell refuses empty PIMPMYSHELL_INSTALL_DIR" {
+    export PIMPMYSHELL_INSTALL_DIR=""
+    run uninstall_pimpmyshell
+    assert_failure
+    assert_output_contains "unsafe path"
+}
+
+@test "uninstall_pimpmyshell refuses root path" {
+    export PIMPMYSHELL_INSTALL_DIR="/"
+    run uninstall_pimpmyshell
+    assert_failure
+    assert_output_contains "unsafe path"
+}
+
+@test "uninstall_pimpmyshell refuses HOME path" {
+    export PIMPMYSHELL_INSTALL_DIR="$HOME"
+    run uninstall_pimpmyshell
+    assert_failure
+    assert_output_contains "unsafe path"
+}
+
+# =============================================================================
+# main routing
+# =============================================================================
+
 @test "install.sh main routes --help" {
     run bash "${PIMPMYSHELL_ROOT}/install.sh" --help
     assert_success

@@ -50,34 +50,8 @@ validate_yaml_syntax() {
         return 0
     fi
 
-    # Require yq for syntax check
-    if ! check_command yq; then
-        log_warn "yq not available, skipping YAML syntax validation"
-        return 0
-    fi
-
-    local yq_type
-    yq_type=$(detect_yq_version)
-
-    local validation_output
-    case "$yq_type" in
-        go)
-            validation_output=$(yq eval '.' "$config_file" 2>&1)
-            ;;
-        python)
-            validation_output=$(yq '.' "$config_file" 2>&1)
-            ;;
-        *)
-            return 0
-            ;;
-    esac
-
-    local status=$?
-    if [[ $status -ne 0 ]]; then
-        log_error "Invalid YAML syntax in $config_file"
-        if [[ -n "$validation_output" ]]; then
-            log_error "$validation_output"
-        fi
+    # Delegate to yq_validate from yq-utils.sh
+    if ! yq_validate "$config_file"; then
         return 1
     fi
 
@@ -153,7 +127,13 @@ validate_config_values() {
 ## Usage: validate_config [config_file]
 ## Returns: 0 if valid, 1 if critical errors
 validate_config() {
-    local config_file="${1:-${PIMPMYSHELL_CONFIG_FILE:-$DEFAULT_CONFIG_FILE}}"
+    # Use default only if no argument provided (not for empty string)
+    local config_file
+    if [[ $# -gt 0 ]]; then
+        config_file="$1"
+    else
+        config_file="${PIMPMYSHELL_CONFIG_FILE:-$DEFAULT_CONFIG_FILE}"
+    fi
 
     # Check file exists
     if [[ -z "$config_file" ]]; then
